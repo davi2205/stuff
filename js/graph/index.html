@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    canvas {
+      border: 1px solid black;
+    }
+  </style>
+</head>
+
+<body>
+  <canvas id="canvas" width="640" height="480"></canvas>
+  <div id="output"></div>
+  <script>
+    /** @type {HTMLCanvasElement} */
+    var canvas = document.getElementById("canvas");
+    /** @type {CanvasRenderingContext2D} */
+    var ctx = canvas.getContext("2d");
+    var output = document.getElementById("output");
+
+    function randInt(a, b) {
+      return Math.floor(a + Math.random() * (b - a));
+    }
+
+    function conclusion(str) {
+      output.innerHTML = str;
+    }
+
+    ctx.setTransform(1, 0, 0, -1, 0, canvas.height);
+
+    var successCount = 0;
+    var failCount = 0;
+
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.beginPath();
+
+      var years = 10;
+
+      //var virtualWidth = 25550;
+      //var virtualWidth = 10950;
+      //var virtualWidth = 7300;
+      var virtualWidth = years * 365;
+      //var virtualWidth = 365;
+      var virtualHeight = 90000;
+
+      var y = 20000;
+
+      var events = [];
+      var eventCount = 16 * years;
+      var eventMaxDistance = 0;
+      var eventMinDistance = 9999999;
+      var lastEventDay = 0;
+
+      var biggestEvent = 0;
+      var biggestMonth = 0;
+      var smallestMonth = 9999999;
+      var averageMonthSpent = 0;
+
+      for (var i = 0; i < eventCount; i++) {
+        var event = randInt(500, 1000);
+        biggestEvent = Math.max(biggestEvent, event);
+        events[randInt(0, virtualWidth)] = biggestEvent;
+      }
+
+      var monthStart = y;
+
+      for (var i = 0; i < virtualWidth; i++) {
+        var x = i;
+
+        if ((i % 30) == 0) {
+          var monthSpent = Math.max(1600, Math.abs(monthStart - y));
+
+          averageMonthSpent += monthSpent;
+
+          biggestMonth = Math.max(biggestMonth, monthSpent);
+          smallestMonth = Math.min(smallestMonth, monthSpent);
+
+          var perc = randInt(2, 5);
+
+          y += 2300 + Math.max(0, y * (perc / 100.0));
+
+          monthStart = y;
+        }
+
+        var initY = y;
+
+        var v = randInt(30, 74);
+
+        y -= v;
+
+        if (events[i]) {
+          y -= events[i];
+          eventMaxDistance = Math.max(eventMaxDistance, i - lastEventDay);
+          eventMinDistance = Math.min(eventMinDistance, i - lastEventDay);
+          lastEventDay = i;
+        }
+
+        realX = 640.0 * (x / virtualWidth);
+        realY = 480.0 * (y / virtualHeight);
+
+        if (i == 0) {
+          ctx.moveTo(realX, realY);
+        } else {
+          ctx.lineTo(realX, realY);
+        }
+      }
+
+      ctx.stroke();
+
+      averageMonthSpent = Math.floor(averageMonthSpent / (virtualWidth / 30));
+      
+      if (y > 2300) successCount++; else failCount++;
+
+      var total = successCount + failCount;
+      var successPerc = Math.floor((successCount / total) * 1000.0) / 10.0;
+      var failPerc = Math.floor((failCount / total) * 1000.0) / 10.0;
+
+      conclusion(eventMaxDistance + ' - ' + eventMinDistance + ' - ' + biggestEvent + ' - ' + smallestMonth + ' - ' + biggestMonth + ' - ' + averageMonthSpent + '<br>' + successCount + ' - ' + failCount + '<br>' + successPerc + ' - ' + failPerc);
+
+      //console.log(y > 1000 ? 'success' : 'fail');
+      
+      window.requestAnimationFrame(draw);
+    }
+    draw();
+  </script>
+</body>
+
+</html>
