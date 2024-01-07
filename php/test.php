@@ -4,7 +4,9 @@ $file = 'semadult.pdf';
 
 $fp = fopen($file, 'r');
 
-while ( $content = fread($fp, 240 * 1024) ) {
+$tamanhoBloco = 1024; // deve ser maior q o tamanho da string a ser pesquisada
+
+while ( $content = fread($fp, $tamanhoBloco) ) {
     $slashPos = strrpos($content, '/');
 
     if ($slashPos) {

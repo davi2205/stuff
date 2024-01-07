@@ -64,6 +64,8 @@ int main()
     DVM_String str;
     DVM_StringInit("hell world", &str);
 
+
+    DVM_StringInit("teste", 23);
     
 
     printf("%s\n", (const char *)str.buffer);

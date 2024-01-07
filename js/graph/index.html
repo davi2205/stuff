@@ -36,11 +36,12 @@
     var successCount = 0;
     var failCount = 0;
 
-    function draw() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.beginPath();
+    for (var __i = 0; __i < 100000; __i++) {
+      //function draw() {
+      // ctx.clearRect(0, 0, canvas.width, canvas.height);
+      // ctx.beginPath();
 
-      var years = 10;
+      var years = 30;
 
       //var virtualWidth = 25550;
       //var virtualWidth = 10950;
@@ -52,7 +53,7 @@
       var y = 20000;
 
       var events = [];
-      var eventCount = 16 * years;
+      var eventCount = 12 * years;
       var eventMaxDistance = 0;
       var eventMinDistance = 9999999;
       var lastEventDay = 0;
@@ -63,7 +64,7 @@
       var averageMonthSpent = 0;
 
       for (var i = 0; i < eventCount; i++) {
-        var event = randInt(500, 1000);
+        var event = randInt(500, 1500);
         biggestEvent = Math.max(biggestEvent, event);
         events[randInt(0, virtualWidth)] = biggestEvent;
       }
@@ -74,14 +75,17 @@
         var x = i;
 
         if ((i % 30) == 0) {
-          var monthSpent = Math.max(1600, Math.abs(monthStart - y));
+          var monthSpent = monthStart - y;
+          if (monthSpent < 0.01 && i > 0) window.alert("wrong");
 
           averageMonthSpent += monthSpent;
 
-          biggestMonth = Math.max(biggestMonth, monthSpent);
-          smallestMonth = Math.min(smallestMonth, monthSpent);
+          if (i > 0) {
+            biggestMonth = Math.max(biggestMonth, monthSpent);
+            smallestMonth = Math.min(smallestMonth, monthSpent);
+          }
 
-          var perc = randInt(2, 5);
+          var perc = randInt(2, 8);
 
           y += 2300 + Math.max(0, y * (perc / 100.0));
 
@@ -104,17 +108,18 @@
         realX = 640.0 * (x / virtualWidth);
         realY = 480.0 * (y / virtualHeight);
 
-        if (i == 0) {
-          ctx.moveTo(realX, realY);
-        } else {
-          ctx.lineTo(realX, realY);
-        }
+        // if (i == 0) {
+        //   ctx.moveTo(realX, realY);
+        // } else {
+        //   ctx.lineTo(realX, realY);
+        // }
       }
 
-      ctx.stroke();
+      // ctx.strokeStyle = (y > 2300 ? 'green' : 'red');
+      // ctx.stroke();
 
       averageMonthSpent = Math.floor(averageMonthSpent / (virtualWidth / 30));
-      
+
       if (y > 2300) successCount++; else failCount++;
 
       var total = successCount + failCount;
@@ -124,10 +129,10 @@
       conclusion(eventMaxDistance + ' - ' + eventMinDistance + ' - ' + biggestEvent + ' - ' + smallestMonth + ' - ' + biggestMonth + ' - ' + averageMonthSpent + '<br>' + successCount + ' - ' + failCount + '<br>' + successPerc + ' - ' + failPerc);
 
       //console.log(y > 1000 ? 'success' : 'fail');
-      
-      window.requestAnimationFrame(draw);
+
+      //window.requestAnimationFrame(draw);
     }
-    draw();
+    //draw();
   </script>
 </body>
 
