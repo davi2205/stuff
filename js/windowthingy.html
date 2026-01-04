@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <canvas style="border: 1px solid black;" id="screen" width="640" height="480"></canvas>
+    <script type="module">
+
+        async function _fetch( url ) {
+
+            return { json: async () => ( { methods: [ 'foo', 'bar', 'baz', 'saveForm' ] } ) };
+            
+        }
+
+        class RemoteObject {
+
+            #methods = null;
+
+            /**
+             * @param {string} classUrl 
+             * @returns {Promise<RemoteObject>}
+             */
+            static async newFrom( classUrl ) {
+
+                var obj, proxyMethods;
+
+                obj = new RemoteObject;
+                obj.#init( await ( await _fetch( classUrl ) ).json() );
+
+                proxyMethods = {
+                    get( target, prop, receiver ) {
+
+                        if ( !target.#methods.includes( prop ) ) return Reflect.get( target, prop, receiver );
+                        return async ( ...args ) => await target.#callMethod( prop, args );
+
+                    },
+                };
+
+                return new Proxy( obj, proxyMethods );
+
+            }
+
+            #init( { methods } ) {
+
+                this.#methods = methods;
+
+            }
+
+            async #callMethod( name, args ) {
+
+                console.log( `Calling method ${name} with arguments:`, args );
+
+            }
+            
+        }
+
+        var solicitacaoService;
+
+        solicitacaoService = await RemoteObject.newFrom( 'http://localhost:8000/js/windowthingy.json' );
+        console.log( solicitacaoService.saveForm(23, 43) );
+        
+
+    </script>
+</body>
+</html>
