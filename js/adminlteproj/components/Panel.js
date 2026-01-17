@@ -1,6 +1,6 @@
 
 // import { Listeners } from "./Listeners.js";
-import { generateUniqueId, stringToHtml } from "./helpers.js";
+import { generateUniqueId, htmlElement, associateObject } from "../support/htmlUtils.js";
 
 export class Panel {
     #id;
@@ -11,8 +11,12 @@ export class Panel {
         // this.#listeners = new Listeners({ requiredMethods: [] });
     }
 
-    buildAt(target) {
-        target.appendChild(stringToHtml(/*html*/`
+    buildAt(targetElement) {
+        if (this.element) {
+            throw new Error('Panel already built');
+        }
+
+        targetElement.appendChild(htmlElement(/*html*/`
             <div class="wrapper" id="${this.#id}">
                 <!-- Navbar -->
                 <nav class="main-header navbar navbar-expand navbar-white navbar-light">
@@ -78,34 +82,6 @@ export class Panel {
                         <nav class="mt-2">
                             <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu"
                                 data-accordion="false">
-                                <!-- Add icons to the links using the .nav-icon class
-                    with font-awesome or any other icon font library -->
-                                <li class="nav-item menu-open">
-                                    <a href="#" class="nav-link active">
-                                        <i class="nav-icon fas fa-tachometer-alt"></i>
-                                        <p>Starter Pages <i class="right fas fa-angle-left"></i></p>
-                                    </a>
-                                    <ul class="nav nav-treeview">
-                                        <li class="nav-item">
-                                            <a href="#" class="nav-link active">
-                                                <i class="far fa-circle nav-icon"></i>
-                                                <p>Active Page</p>
-                                            </a>
-                                        </li>
-                                        <li class="nav-item">
-                                            <a href="#" class="nav-link">
-                                                <i class="far fa-circle nav-icon"></i>
-                                                <p>Inactive Page</p>
-                                            </a>
-                                        </li>
-                                    </ul>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="#" class="nav-link">
-                                        <i class="nav-icon fas fa-th"></i>
-                                        <p>Simple Link <span class="right badge badge-danger">New</span></p>
-                                    </a>
-                                </li>
                             </ul>
                         </nav>
                         <!-- /.sidebar-menu -->
@@ -154,12 +130,17 @@ export class Panel {
                 <div id="sidebar-overlay"></div>
             </div>
         `));
+
+        associateObject(this.element, this);
     }
 
     set brandTitle(title) {
         document.querySelector(`#${this.#id} .brand-link .brand-text`).textContent = title;
     }
 
+    /**
+     * @param {Array<{title: string, link: string, active?: boolean}>} items
+     */
     set breadcrumbs(items) {
         document.querySelector(`#${this.#id} .breadcrumb`).innerHTML = items.map(item => {
             if (item.active) {
@@ -170,8 +151,51 @@ export class Panel {
         }).join('');
     }   
 
+    /**
+    * @param {Array<{title: string, icon: string, link: string, active?: boolean, subMenu?: Array}>} items
+    */
     set menu(items) {
-        
+        function generateMenuItemsHtml(items) {
+            return items.map(item => {
+                if (item.subMenu && item.subMenu.length > 0) {
+                    if (!item.isHeader) {
+                        return /*html*/`
+                            <li class="nav-item ${item.active ? 'menu-open' : ''}">
+                                <a href="${item.link || '#'}" class="nav-link ${item.active ? 'active' : ''}">
+                                    <i class="nav-icon ${item.icon}"></i>
+                                    <p>
+                                        ${item.title} <i class="right fas fa-angle-left"></i>
+                                    </p>
+                                </a>
+                                <ul class="nav nav-treeview">
+                                    ${generateMenuItemsHtml(item.subMenu)}
+                                </ul>
+                            </li>
+                        `;
+                    } else {
+                        return /*html*/`
+                            <li class="nav-header">${item.title}</li>
+                            ${generateMenuItemsHtml(item.subMenu)}
+                        `;
+                    }
+                } else {
+                    return /*html*/`
+                        <li class="nav-item">
+                            <a href="${item.link || '#'}" class="nav-link ${item.active ? 'active' : ''}">
+                                <i class="nav-icon ${item.icon}"></i>
+                                <p>${item.title}</p>
+                            </a>
+                        </li>
+                    `;
+                }
+            }).join('');
+        }
+
+        document.querySelector(`#${this.#id} .nav-sidebar`).innerHTML = generateMenuItemsHtml(items);
+    }
+
+    get element() {
+        return document.querySelector(`#${this.#id}`);
     }
 
     get bodyElement() {

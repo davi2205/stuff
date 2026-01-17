@@ -1,5 +1,5 @@
 
-import { generateUniqueId, stringToHtml } from "./helpers.js";
+import { generateUniqueId, htmlElement, associateObject } from "../support/htmlUtils.js";
 
 export class Card {
     #id;
@@ -8,8 +8,12 @@ export class Card {
         this.#id = generateUniqueId('card-');
     }
 
-    buildAt(target) {
-        target.appendChild(stringToHtml(/*html*/`
+    buildAt(targetElement) {
+        if (this.element) {
+            throw new Error('Card already built');
+        }
+
+        targetElement.appendChild(htmlElement(/*html*/`
             <div class="card" id="${this.#id}">
                 <div class="card-header">
                     <h3 class="card-title"></h3>
@@ -24,14 +28,20 @@ export class Card {
                 </div>
                 <div class="card-body">
                 </div>
-                <div class="card-footer" style="display: none;">
+                <div class="card-footer d-none">
                 </div>
             </div>
         `));
+
+        associateObject(this.element, this);
     }
 
     set title(title) {
         document.querySelector(`#${this.#id} .card-title`).textContent = title;
+    }
+
+    get element() {
+        return document.querySelector(`#${this.#id}`);
     }
 
     get bodyElement() {
@@ -43,6 +53,6 @@ export class Card {
     }
 
     set enableFooter(enable) {
-        document.querySelector(`#${this.#id} .card-footer`).style.display = enable ? 'block' : 'none';
+        this.footerElement.classList.toggle('d-none', !enable);
     }
 }

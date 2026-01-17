@@ -4,11 +4,14 @@ export const REQUIRE_ALL = 1;
 
 export class Listeners {
     #array = new Array();
-    #requiredMethods = new Array();
+    #requiredMethods;
     #requirementType = REQUIRE_AT_LEAST_ONE;
 
-    constructor({ requiredMethods = [] } = {}) {
-        this.#requiredMethods = requiredMethods;
+    set requiredMethods(methods) {
+        if (!Array.isArray(methods)) {
+            throw new Error("requiredMethods must be an array");
+        }
+        this.#requiredMethods = structuredClone(methods);
     }
 
     set requirementType(type) {
@@ -26,15 +29,15 @@ export class Listeners {
         var requiredMethod, foundRequiredMethodCount;
         foundRequiredMethodCount = 0;
         for (requiredMethod of this.#requiredMethods) {
-            if (typeof listener[requiredMethod] !== "function") {
+            if (typeof listener[requiredMethod] === "function") {
                 foundRequiredMethodCount++;
             }
         }
         if (this.#requirementType == REQUIRE_ALL && foundRequiredMethodCount < this.#requiredMethods.length) {
-            throw new Error("Listener does not implement all required methods");
+            throw new Error(`Listener does not implement all required methods: ${this.#requiredMethods.join(', ')}`);
         }
         if (this.#requirementType == REQUIRE_AT_LEAST_ONE && this.#requiredMethods.length > 0 && foundRequiredMethodCount == 0) {
-            throw new Error("Listener does not implement any required methods");
+            throw new Error(`Listener does not implement any of the required methods: ${this.#requiredMethods.join(', ')}`);
         }
         this.#array.push(listener);
     }
