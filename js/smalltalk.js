@@ -4,7 +4,7 @@
 
 class Tokenizer {
 
-    tokenize( source ) {
+    tokenize(source) {
 
         var index, ch, tokens, chars, pointCount;
 
@@ -14,18 +14,18 @@ class Tokenizer {
         chars = new Array;
         pointCount = 0;
 
-        for ( ;; ) {
+        for (; ;) {
 
-            if ( ch === '' ) break;
+            if (ch === '') break;
 
-            if ( ch === ' ' || ch === '\t' || ch === '\n' || ch === '\r' ) {
+            if (ch === ' ' || ch === '\t' || ch === '\n' || ch === '\r') {
 
                 ch = source.charAt( ++index );
                 continue;
 
             }
 
-            if ( ch === '(' || ch === ')' || ch === '[' || ch === ']' || ch == '|' || ch === '.' || ch === ';' || ch === '^' ) {
+            if (ch === '(' || ch === ')' || ch === '[' || ch === ']' || ch == '|' || ch === '.' || ch === ';' || ch === '^') {
 
                 tokens.push( { type: ch, value: null } );
                 ch = source.charAt( ++index );
@@ -33,7 +33,7 @@ class Tokenizer {
 
             }
 
-            if ( ch >= '0' && ch <= '9' ) {
+            if (ch >= '0' && ch <= '9') {
 
                 chars.length = 0;
                 pointCount = 0;
@@ -43,25 +43,25 @@ class Tokenizer {
                     chars.push( ch );
                     ch = source.charAt( ++index );
 
-                    if ( ch === '.' ) pointCount++;
+                    if (ch === '.') pointCount++;
 
-                } while ( ch >= '0' && ch <= '9' && pointCount < 2 );
+                } while (ch >= '0' && ch <= '9' && pointCount < 2);
 
-                tokens.push( { type: 'number', value: parseInt( chars.join( '' ), 10 ) } );
+                tokens.push({ type: 'number', value: parseInt(chars.join(''), 10) });
                 continue;
 
             }
 
-            if ( ch === "'" ) {
+            if (ch === "'") {
 
                 chars.length = 0;
                 ch = source.charAt( ++index );
 
-                for ( ;; ) {
+                for (; ;) {
 
-                    if ( ch === '' ) throw new Error( 'Unterminated string literal' );
+                    if (ch === '') throw new Error('Unterminated string literal');
 
-                    if ( ch === "'" ) {
+                    if (ch === "'") {
 
                         ch = source.charAt( ++index );
                         if ( ch !== "'" ) break;
@@ -71,14 +71,14 @@ class Tokenizer {
                     chars.push( ch );
                     ch = source.charAt( ++index );
 
-                } 
+                }
 
-                tokens.push( { type: 'string', value: chars.join( '' ) } );
+                tokens.push({ type: 'string', value: chars.join('') });
                 continue;
 
             }
 
-            if ( ch == ':' ) {
+            if (ch == ':') {
 
                 chars.length = 0;
 
@@ -87,14 +87,14 @@ class Tokenizer {
                     chars.push( ch );
                     ch = source.charAt( ++index );
 
-                } while ( ch >= 'a' && ch <= 'z' || ch >= 'A' && ch <= 'Z' || ch >= '0' && ch <= '9' );
+                } while (ch >= 'a' && ch <= 'z' || ch >= 'A' && ch <= 'Z' || ch >= '0' && ch <= '9');
 
-                tokens.push( { type: 'param', value: chars.join( '' ) } );
+                tokens.push({ type: 'param', value: chars.join('') });
                 continue;
 
             }
 
-            if ( ch >= 'a' && ch <= 'z' || ch >= 'A' && ch <= 'Z' ) {
+            if (ch >= 'a' && ch <= 'z' || ch >= 'A' && ch <= 'Z') {
 
                 chars.length = 0;
 
@@ -103,7 +103,7 @@ class Tokenizer {
                     chars.push( ch );
                     ch = source.charAt( ++index );
 
-                } while ( ch >= 'a' && ch <= 'z' || ch >= 'A' && ch <= 'Z' || ch >= '0' && ch <= '9' );
+                } while (ch >= 'a' && ch <= 'z' || ch >= 'A' && ch <= 'Z' || ch >= '0' && ch <= '9');
 
                 if ( ch === ':' ) {
  
@@ -113,12 +113,12 @@ class Tokenizer {
 
                 }
 
-                tokens.push( { type: 'name', value: chars.join( '' ) } );
+                tokens.push({ type: 'name', value: chars.join('') });
                 continue;
 
             }
 
-            throw new Error( 'Unexpected character: ' + ch );
+            throw new Error('Unexpected character: ' + ch);
 
         }
 
