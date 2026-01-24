@@ -1,4 +1,4 @@
-import { associateObject, generateUniqueId, htmlElement } from "../support/htmlUtils.js";
+import { associateObject, generateUniqueId, htmlElement } from "../shared/htmlHelpers.js";
 
 export class Layout {
     #id;

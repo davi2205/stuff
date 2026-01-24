@@ -34,7 +34,7 @@
 //                     $value = 'null';
 //                     break;
 //                 }
-                
+
 //                 echo $value . " ";
 //             }
 //             echo "\n";
@@ -97,7 +97,7 @@ class Block
             for ($i = 0; $i < ($newCount - $count); $i++) {
                 array_push($this->valueTable, null);
             }
-        } else if ($newCount < $count) {
+        } elseif ($newCount < $count) {
             $this->valueTable = array_slice($this->valueTable, 0, $count);
         }
 
@@ -153,7 +153,7 @@ class Block
     }
 }
 
-$u = new Block;
+$u = new Block();
 $u->setValues([
     [null, 'all cases', null, null, 'otherwise'],
     ['Player', '(...)'],

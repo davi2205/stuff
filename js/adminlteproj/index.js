@@ -4,8 +4,8 @@ import { Card } from './components/Card.js';
 import { Button } from './components/Button.js';
 import { Input } from './components/Input.js';
 import { Layout } from './components/Layout.js';
-import { api } from './app/Api.js';
-import { setupDefaultPanel } from './support/componentUtils.js';
+import { api } from './remote/System.js';
+import { setupDefaultPanel } from './shared/componentHelpers.js';
 
 new class {
     constructor() {
@@ -21,7 +21,6 @@ new class {
 
         panel = new Panel();
         panel.buildAt(document.getElementById('app-root'));
-        panel.brandTitle = "My Panel 2";
         await setupDefaultPanel(panel);
 
         layout = new Layout();

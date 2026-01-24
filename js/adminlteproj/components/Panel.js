@@ -1,6 +1,6 @@
 
 // import { Listeners } from "./Listeners.js";
-import { generateUniqueId, htmlElement, associateObject } from "../support/htmlUtils.js";
+import { generateUniqueId, htmlElement, associateObject } from "../shared/htmlHelpers.js";
 
 export class Panel {
     #id;

@@ -6,7 +6,7 @@ $fp = fopen($file, 'r');
 
 $tamanhoBloco = 1024; // deve ser maior q o tamanho da string a ser pesquisada
 
-while ( $content = fread($fp, $tamanhoBloco) ) {
+while ($content = fread($fp, $tamanhoBloco)) {
     $slashPos = strrpos($content, '/');
 
     if ($slashPos) {
@@ -26,4 +26,3 @@ while ( $content = fread($fp, $tamanhoBloco) ) {
 }
 
 fclose($fp);
-

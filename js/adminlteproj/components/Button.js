@@ -1,6 +1,6 @@
 
-import { generateUniqueId, htmlElement, associateObject } from "../support/htmlUtils.js";
-import { Listeners } from "../support/Listeners.js";
+import { generateUniqueId, htmlElement, associateObject } from "../shared/htmlHelpers.js";
+import { Listeners } from "../shared/Listeners.js";
 
 export class Button {
     #id;
