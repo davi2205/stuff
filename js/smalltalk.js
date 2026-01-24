@@ -2,39 +2,14 @@
 
 
 
-
-
-
-
-
-
-
-
-class ServerObject {
-
-    static async newInstanceOf( className, ...args ) {
-
-        //
-
-    }
-
-}
-
-var foo, ok;
-
-foo = await ServerObject.newInstanceOf( 'Foo' );
-ok = await foo.saveForm( { x: 300, y: 400 } );
- 
-
-
 class Tokenizer {
 
     tokenize( source ) {
 
-        var i, ch, tokens, chars, pointCount;
+        var index, ch, tokens, chars, pointCount;
 
-        i = 0;
-        ch = source.charAt( i );
+        index = 0;
+        ch = source.charAt( index );
         tokens = new Array;
         chars = new Array;
         pointCount = 0;
@@ -45,7 +20,7 @@ class Tokenizer {
 
             if ( ch === ' ' || ch === '\t' || ch === '\n' || ch === '\r' ) {
 
-                ch = source.charAt( ++i );
+                ch = source.charAt( ++index );
                 continue;
 
             }
@@ -53,7 +28,7 @@ class Tokenizer {
             if ( ch === '(' || ch === ')' || ch === '[' || ch === ']' || ch == '|' || ch === '.' || ch === ';' || ch === '^' ) {
 
                 tokens.push( { type: ch, value: null } );
-                ch = source.charAt( ++i );
+                ch = source.charAt( ++index );
                 continue;
 
             }
@@ -66,7 +41,7 @@ class Tokenizer {
                 do {
 
                     chars.push( ch );
-                    ch = source.charAt( ++i );
+                    ch = source.charAt( ++index );
 
                     if ( ch === '.' ) pointCount++;
 
@@ -80,7 +55,7 @@ class Tokenizer {
             if ( ch === "'" ) {
 
                 chars.length = 0;
-                ch = source.charAt( ++i );
+                ch = source.charAt( ++index );
 
                 for ( ;; ) {
 
@@ -88,13 +63,13 @@ class Tokenizer {
 
                     if ( ch === "'" ) {
 
-                        ch = source.charAt( ++i );
+                        ch = source.charAt( ++index );
                         if ( ch !== "'" ) break;
 
                     }
 
                     chars.push( ch );
-                    ch = source.charAt( ++i );
+                    ch = source.charAt( ++index );
 
                 } 
 
@@ -110,7 +85,7 @@ class Tokenizer {
                 do {
 
                     chars.push( ch );
-                    ch = source.charAt( ++i );
+                    ch = source.charAt( ++index );
 
                 } while ( ch >= 'a' && ch <= 'z' || ch >= 'A' && ch <= 'Z' || ch >= '0' && ch <= '9' );
 
@@ -126,13 +101,13 @@ class Tokenizer {
                 do {
 
                     chars.push( ch );
-                    ch = source.charAt( ++i );
+                    ch = source.charAt( ++index );
 
                 } while ( ch >= 'a' && ch <= 'z' || ch >= 'A' && ch <= 'Z' || ch >= '0' && ch <= '9' );
 
                 if ( ch === ':' ) {
  
-                    ch = source.charAt( ++i );
+                    ch = source.charAt( ++index );
                     tokens.push( { type: 'keyword', value: chars.join( '' ) + ':' } );
                     continue;
 
@@ -153,28 +128,34 @@ class Tokenizer {
 
 }
 
+class Parser {
+
+    #tokens = null;
+    #tokenIndex = 0;
+
+    scope( fn ) {
+
+        var savedIndex;
+
+        savedIndex = this.#tokenIndex;
+        if ( ! fn() ) this.#tokenIndex = savedIndex; 
+
+    }
+
+    parse( source ) {
+
+        var tokenizer;
+
+        tokenizer = new Tokenizer;
+        this.#tokens = tokenizer.tokenize( source );
+        this.#tokenIndex = 0;
+
+        this.scope( () => {
 
 
-var s = new Tokenizer;
-console.log( s.tokenize( `
 
-    from: aNumber to: anotherNumber do: aBlock
+        } );
 
-    | a b c |
+    }
 
-    0 to: 10 do: [ :i | Transcript show: i; cr ].    
-
-    0 to: 10 do: [ :i |
-    
-        Transcript show: i; cr.
-        Transcript show: i; cr.
-        Transcript show: [
-        
-            Transcript show: i; cr.
-            Transcript show: i; cr.
-
-        ].
-        
-    ].
-
-` ) );
+}
