@@ -8,59 +8,37 @@
 <body>
     <canvas style="border: 1px solid black;" id="screen" width="640" height="480"></canvas>
     <script type="module">
-
-        async function _fetch( url ) {
-
-            return { json: async () => ( { methods: [ 'foo', 'bar', 'baz', 'saveForm' ] } ) };
-            
-        }
-
         class RemoteObject {
+            static #repository;
+            static #authorization;
 
-            #methods = null;
-
-            /**
-             * @param {string} classUrl 
-             * @returns {Promise<RemoteObject>}
-             */
-            static async newFrom( classUrl ) {
-
-                var obj, proxyMethods;
-
-                obj = new RemoteObject;
-                obj.#init( await ( await _fetch( classUrl ) ).json() );
-
-                proxyMethods = {
-                    get( target, prop, receiver ) {
-
-                        if ( !target.#methods.includes( prop ) ) return Reflect.get( target, prop, receiver );
-                        return async ( ...args ) => await target.#callMethod( prop, args );
-
-                    },
-                };
-
-                return new Proxy( obj, proxyMethods );
-
+            static setAuthorization(token) {
+                this.#authorization = token;
             }
 
-            #init( { methods } ) {
-
-                this.#methods = methods;
-
+            static setRepositoryUrl(url) {
+                this.#repository = url;
             }
 
-            async #callMethod( name, args ) {
-
-                console.log( `Calling method ${name} with arguments:`, args );
-
+            static async create(_class) {
+                
             }
-            
         }
 
-        var solicitacaoService;
+        class Solicitacao {
+            async createView() {
+                var item;
+                for (item of await this.schema()) {
+                    console.log(item);
+                }
+                if (!await this.save({protocolo: '', cliente: ''}) {
+                    console.error('Erro ao salvar');
+                }
+            }
+        }
 
-        solicitacaoService = await RemoteObject.newFrom( 'http://localhost:8000/js/windowthingy.json' );
-        console.log( solicitacaoService.saveForm(23, 43) );
+        var x = await RemoteObject.create(Solicitacao);
+        x.createView();
         
 
     </script>

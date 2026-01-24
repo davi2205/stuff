@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <c-panel>
+        <c-content align="center">
+            <h1>Custom Content Inside Panel</h1>
+            <p>This content is centered within the custom panel component.</p>
+        </c-content>      
+    </c-panel>
+    <script>
+        function generateHtml(source) {
+            var template;
+            template = document.createElement('template');
+            template.innerHTML = source;
+            return template.content.cloneNode(true);
+        }
+
+        class Panel extends HTMLElement {
+            constructor() {
+                super();
+            }
+
+            connectedCallback() {
+                var root;
+
+                root = generateHtml(`
+                    <div>
+                            
+                    </div>
+                `);
+            }
+        }
+
+        customElements.define('c-panel', Panel);
+    </script>
+</body>
+</html>
