@@ -108,12 +108,6 @@ export class Input {
         this.#switchToInput();
     }
 
-    dataSuccess(data) {
-        if (this.#select2Request) {
-            this.#select2Request.success(data);
-        }
-    }
-
     emitEventsTo(listener) {
         this.#eventEmitter.emitTo(listener);
     }
