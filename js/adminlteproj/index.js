@@ -1,89 +1,50 @@
-
-import { Panel } from './components/Panel.js';
-import { Card } from './components/Card.js';
-import { Button } from './components/Button.js';
-import { Input } from './components/Input.js';
-import { Layout } from './components/Layout.js';
-import { api } from './remote/System.js';
-import { setupDefaultPanel } from './shared/componentHelpers.js';
+import { Input } from "./view/Input.js";
 
 new class {
     constructor() {
-        this.build();
-    }
+        var rootElement, input;
 
-    async onButtonClick(button) {
-        alert("Você clicou no botão: " + button.title + " " + JSON.stringify(await api.availableRoutes()));
-    }
-
-    async build() {
-        var panel, layout, card, input, btn;
-
-        panel = new Panel();
-        panel.buildAt(document.getElementById('app-root'));
-        await setupDefaultPanel(panel);
-
-        layout = new Layout();
-        layout.buildAt(panel.bodyElement);
-
-        layout.addCell(4);
-        card = new Card();
-        card.buildAt(layout.activeCellElement);
-        card.title = "My Card 1";
+        rootElement = document.getElementById('app-root');
 
         input = new Input();
-        input.buildAt(card.bodyElement);
-        input.title = "Nome";
+        input.appendAt(rootElement);
+        input.label = "Nome";
         input.placeholder = "Digite seu nome";
+        input.type = 'select';
+        input.emitEventsTo(this);
 
-        btn = new Button();
-        btn.notifyEventsTo(this);
-        btn.buildAt(card.bodyElement);
-        btn.title = "Salvar";
-
-        btn = new Button();
-        btn.notifyEventsTo(this);
-        btn.buildAt(card.bodyElement);
-        btn.title = "Editar";
-
-        layout.addCell(4);
-        card = new Card();
-        card.buildAt(layout.activeCellElement);
-        card.title = "My Card 1";
-
-        input = new Input();
-        input.buildAt(card.bodyElement);
-        input.title = "Nome";
-        input.placeholder = "Digite seu nome";
-
-        btn = new Button();
-        btn.notifyEventsTo(this);
-        btn.buildAt(card.bodyElement);
-        btn.title = "Salvar";
-
-        btn = new Button();
-        btn.notifyEventsTo(this);
-        btn.buildAt(card.bodyElement);
-        btn.title = "Editar";
-
-        layout.addCell(4);
-        card = new Card();
-        card.buildAt(layout.activeCellElement);
-        card.title = "My Card 1";
-
-        input = new Input();
-        input.buildAt(card.bodyElement);
-        input.title = "Nome";
-        input.placeholder = "Digite seu nome";
-
-        btn = new Button();
-        btn.notifyEventsTo(this);
-        btn.buildAt(card.bodyElement);
-        btn.title = "Salvar";
-
-        btn = new Button();
-        btn.notifyEventsTo(this);
-        btn.buildAt(card.bodyElement);
-        btn.title = "Editar";
     }
-}    
+
+    onImmediateChange(input) {
+        var oldValue, newValue;
+
+        oldValue = input.value.replace(/[^0-9]/g, '');
+        newValue = '';
+        if (oldValue.length > 0) {
+            newValue += '(' + oldValue.slice(0, 2);
+        }
+        if (oldValue.length > 2) {
+            newValue += ') ' + oldValue.slice(2, 7);
+        }
+        if (oldValue.length > 7) {
+            newValue += '-' + oldValue.slice(7, 11);
+        }
+        input.value = newValue;
+
+    }
+
+    onChange(input) {
+        console.log("Valor alterado: " + input.value);
+    }
+
+    onDataRequest(input) {
+        console.log(input.requestParams);
+        input.requestData = [
+            { id: '1', text: 'Opção 1' },
+            { id: '2', text: 'Opção 2' },
+            { id: '3', text: 'Opção 3' },
+            { id: '4', text: 'Opção 4' },
+            { id: '5', text: 'Opção 5' },
+        ];
+    }
+}

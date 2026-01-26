@@ -1,13 +1,13 @@
 
-export class Listeners {
-    #array = new Array;
+export class EventEmitter {
+    #listeners = new Array();
     #events;
 
-    constructor(events) {
+    constructor({ events }) {
         this.#events = structuredClone(events);
     }
 
-    add(listener) {
+    emitTo(listener) {
         var hasAtLeastOne;
         hasAtLeastOne = false;
         for (var eventName of this.#events) {
@@ -19,12 +19,12 @@ export class Listeners {
         if (!hasAtLeastOne) {
             throw new Error('Listener does not implement any of the required events: ' + this.#events.join(', '));
         }
-        this.#array.push(listener);
+        this.#listeners.push(listener);
     }
 
-    notify(eventName, ...args) {
+    emit(eventName, ...args) {
         var listener;
-        for (listener of this.#array) {
+        for (listener of this.#listeners) {
             if (typeof listener[eventName] === 'function') {
                 listener[eventName](...args);
             }
