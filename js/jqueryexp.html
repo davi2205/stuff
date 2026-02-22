@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <div data-namespace="solicitacao.0">
+        <input type="text" name="teste"/>  
+
+        <button onclick="$(this).remote('call')">
+            Click me
+        </button>      
+
+        <span data-js='$("<?= $ ?> button").click()'></span>
+    </div>
+    <script src="jquery/jquery.min.js"></script>
+    <script>
+        (function($) {
+            $.fn.namespace = function() {
+                var namespaceElements;
+
+                namespaceElements = new Array();
+                this.each(function() {
+                    var element, namespaceElement;
+                    element = this.parentElement;
+                    while (element && !namespaceElement) {
+                        if (element.dataset.namespace !== undefined) {
+                            namespaceElement = element;
+                        }
+                    }
+                    if (namespaceElement) {
+                        namespaceElements.push(namespaceElement);
+                    }
+                });
+
+                return $(namespaceElements);
+            };
+
+            $.remoteDispatchUrl = function(url) {
+                remoteDispatchUrl = url;
+            };
+
+            $.fn.remote = function(name, ...args) {
+                if (remoteDispatchUrl === undefined) {
+                    throw new Error("Remote dispatch url not set");
+                }
+                return $.ajax({
+                    url: remoteDispatchUrl,
+                    method: 'POST',
+                    data: {
+                        args: args
+                    }
+                });
+            };
+
+            var remoteDispatchUrl;
+        })($);
+    </script>
+    <script>
+        $.remoteDispatchUrl('');
+    </script>
+</body>
+</html>
