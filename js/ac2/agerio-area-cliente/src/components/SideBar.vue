@@ -1,20 +1,12 @@
 <template>
   <div>
     <!-- Toggle button -->
-    <button 
-      class="btn btn-secondary sidebar-toggle" 
-      @click="toggleSidebar"
-      :class="{ 'sidebar-open': isOpen }"
-    >
+    <button class="btn btn-secondary sidebar-toggle" @click="toggleSidebar" :class="{ 'sidebar-open': isOpen }">
       <i class="fas fa-bars"></i>
     </button>
 
     <!-- Overlay for mobile -->
-    <div 
-      class="sidebar-overlay" 
-      :class="{ 'show': isOpen }"
-      @click="closeSidebar"
-    ></div>
+    <div class="sidebar-overlay" :class="{ 'show': isOpen }" @click="closeSidebar"></div>
 
     <!-- Sidebar -->
     <div class="sidebar" :class="{ 'open': isOpen }">
@@ -26,6 +18,18 @@
         <a href="#" class="nav-link" @click="closeSidebarOnMobile">
           <i class="fas fa-user"></i>
           <span>Perfil</span>
+        </a>
+        <a href="#" class="nav-link" @click="closeSidebarOnMobile">
+          <i class="fas fa-file-alt"></i>
+          <span>Documentos</span>
+        </a>
+        <a href="#" class="nav-link" @click="closeSidebarOnMobile">
+          <i class="fas fa-file-alt"></i>
+          <span>Documentos</span>
+        </a>
+        <a href="#" class="nav-link" @click="closeSidebarOnMobile">
+          <i class="fas fa-file-alt"></i>
+          <span>Documentos</span>
         </a>
         <a href="#" class="nav-link" @click="closeSidebarOnMobile">
           <i class="fas fa-file-alt"></i>
@@ -64,9 +68,11 @@ export default {
       } else {
         this.isOpen = false // Close on mobile
       }
+      this.$emit('sidebar-state-changed', this.isOpen)
     },
     toggleSidebar() {
       this.isOpen = !this.isOpen
+      this.$emit('sidebar-state-changed', this.isOpen)
     },
     closeSidebar() {
       if (this.isMobile) {
@@ -85,7 +91,7 @@ export default {
 <style scoped>
 .sidebar {
   background-color: #6c757d;
-  min-height: 100vh;
+  height: 100vh;
   width: 280px;
   position: fixed;
   left: 0;
@@ -93,6 +99,7 @@ export default {
   padding-top: 20px;
   transition: transform 0.3s ease;
   z-index: 1040;
+  overflow-y: auto;
 }
 
 /* Desktop: sidebar visible by default */
@@ -100,6 +107,7 @@ export default {
   .sidebar {
     transform: translateX(0);
   }
+
   .sidebar:not(.open) {
     transform: translateX(-280px);
   }
@@ -110,6 +118,7 @@ export default {
   .sidebar {
     transform: translateX(-280px);
   }
+
   .sidebar.open {
     transform: translateX(0);
   }
@@ -150,10 +159,8 @@ export default {
   transition: left 0.3s ease;
 }
 
-@media (min-width: 768px) {
-  .sidebar-toggle.sidebar-open {
-    left: 295px;
-  }
+.sidebar-toggle.sidebar-open {
+  left: 295px;
 }
 
 /* Overlay for mobile */
