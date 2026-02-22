@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <div tn-name="solicitacao">
+        <div tn-name="0">
+            <input tn-name="teste" type="text"/>
+            <input tn-name="teste2" type="text"/>
+            <button tn-call="command">Enviar</button>
+        </div>
+    </div>
+    <script type="module">
+        class Titania {
+            #objectByElement = new Map();
+            
+            /** @param {HTMLElement} root */
+            init(root) {
+                function computePath(element) {
+                    var parts, part;
+                    parts = new Array();
+                    for (; element != null; element = element.parentElement) {
+                        part = element.getAttribute('tn-name');
+                        if (part) {
+                            parts.unshift(part);
+                        }
+                    }
+                    return parts.join('.');
+                }
+
+                var element, object;
+                for (element of root.querySelectorAll('[tn-name]')) {
+                    object = {
+                        path: computePath(element),
+                        element: element,
+                        call: null,
+                    };
+                    this.#associateObject(element, object);
+                }
+                for (element of root.querySelectorAll('[tn-call]')) {
+                    object = this.#associatedObject(element);
+                    if (!object) {
+                        object = {
+                            path: computePath(element),
+                            element: element,
+                            call: null,
+                        };
+                        this.#associateObject(element, object);
+                    }
+                    object.call = element.getAttribute('tn-call');
+                }
+            }
+            
+            #associateObject(element, object) {
+                return this.#objectByElement.set(element, object);
+            }
+
+            #associatedObject(element) {
+                return this.#objectByElement.get(element);
+            }
+        }
+
+        const titania = new Titania();
+        titania.init(document.body);
+    </script>
+</body>
+</html>
