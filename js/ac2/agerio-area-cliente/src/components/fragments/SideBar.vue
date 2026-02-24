@@ -10,35 +10,15 @@
 
     <!-- Sidebar -->
     <div class="sidebar" :class="{ 'open': isOpen }">
+      <div class="sidebar-header">
+        <img src="https://via.placeholder.com/200x80/ffffff/1e7ba6?text=AgeRio" alt="AgeRio Logo" class="logo">
+      </div>
       <nav class="nav flex-column">
-        <a href="#" class="nav-link" @click="closeSidebarOnMobile">
-          <i class="fas fa-home"></i>
-          <span>Início</span>
-        </a>
-        <a href="#" class="nav-link" @click="closeSidebarOnMobile">
-          <i class="fas fa-user"></i>
-          <span>Perfil</span>
-        </a>
-        <a href="#" class="nav-link" @click="closeSidebarOnMobile">
-          <i class="fas fa-file-alt"></i>
-          <span>Documentos</span>
-        </a>
-        <a href="#" class="nav-link" @click="closeSidebarOnMobile">
-          <i class="fas fa-file-alt"></i>
-          <span>Documentos</span>
-        </a>
-        <a href="#" class="nav-link" @click="closeSidebarOnMobile">
-          <i class="fas fa-file-alt"></i>
-          <span>Documentos</span>
-        </a>
-        <a href="#" class="nav-link" @click="closeSidebarOnMobile">
-          <i class="fas fa-file-alt"></i>
-          <span>Documentos</span>
-        </a>
-        <a href="#" class="nav-link" @click="closeSidebarOnMobile">
-          <i class="fas fa-sign-out-alt"></i>
-          <span>Sair</span>
-        </a>
+        <router-link v-for="route in menuRoutes" :key="route.name" :to="route.path" class="nav-link"
+          :class="{ active: isActiveRoute(route) }" @click="closeSidebarOnMobile">
+          <i :class="route.meta.icon"></i>
+          <span>{{ route.meta.menuLabel }}</span>
+        </router-link>
       </nav>
     </div>
   </div>
@@ -51,6 +31,12 @@ export default {
     return {
       isOpen: false,
       isMobile: false
+    }
+  },
+  computed: {
+    menuRoutes() {
+      // Filter routes that should be shown in the menu
+      return this.$router.options.routes.filter(route => route.meta?.showInMenu);
     }
   },
   mounted() {
@@ -83,6 +69,10 @@ export default {
       if (this.isMobile) {
         this.isOpen = false
       }
+    },
+    isActiveRoute(route) {
+      // Check if the current route matches this menu item
+      return this.$route.name === route.name || this.$route.path === route.path;
     }
   }
 }
@@ -96,10 +86,21 @@ export default {
   position: fixed;
   left: 0;
   top: 0;
-  padding-top: 20px;
   transition: transform 0.3s ease;
   z-index: 1040;
   overflow-y: auto;
+}
+
+.sidebar-header {
+  background-color: #ffffff;
+  padding: 20px;
+  text-align: center;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.logo {
+  max-width: 100%;
+  height: auto;
 }
 
 /* Desktop: sidebar visible by default */
@@ -130,12 +131,13 @@ export default {
   display: flex;
   align-items: center;
   text-decoration: none;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   transition: background-color 0.3s ease;
+  position: relative;
 }
 
-.nav-link:hover {
-  background-color: rgba(0, 0, 0, 0.1);
+.nav-link:hover,
+.nav-link.active {
+  background-color: rgba(0, 0, 0, 0.2);
   color: #ffffff;
 }
 
