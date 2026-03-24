@@ -3,6 +3,8 @@ function newStack() {
     var stack = [];
     var listStack = [];
 
+    Submenu.addItem("Crylik");
+
     return {
         stack: function () {
             return [].concat(stack);

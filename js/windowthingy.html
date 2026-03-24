@@ -6,41 +6,21 @@
     <title>Document</title>
 </head>
 <body>
-    <canvas style="border: 1px solid black;" id="screen" width="640" height="480"></canvas>
-    <script type="module">
-        class RemoteObject {
-            static #repository;
-            static #authorization;
-
-            static setAuthorization(token) {
-                this.#authorization = token;
-            }
-
-            static setRepositoryUrl(url) {
-                this.#repository = url;
-            }
-
-            static async create(_class) {
-                
-            }
+    <script>
+        function ElementFactory() {
+            //
         }
 
-        class Solicitacao {
-            async createView() {
-                var item;
-                for (item of await this.schema()) {
-                    console.log(item);
-                }
-                if (!await this.save({protocolo: '', cliente: ''}) {
-                    console.error('Erro ao salvar');
-                }
-            }
+        ElementFactory.prototype.createWindow = function(config) {
+            var rootEl;
+            rootEl = document.createElement('div');
+            rootEl.innerHTML =
+                '<div class="window">' +
+                    '<div class="titlebar">' + config.title + '</div>' +
+                    '<div class="content">' + config.content + '</div>' +
+                '</div>';
+            return rootEl;
         }
-
-        var x = await RemoteObject.create(Solicitacao);
-        x.createView();
-        
-
     </script>
 </body>
 </html>
