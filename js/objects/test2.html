@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+
+<body>
+  <canvas id="screen"></canvas>
+  <script>
+    const canvas = document.getElementById('screen');
+    const ctx = canvas.getContext('2d');
+    ctx.textBaseline = 'top';
+
+    const button = {
+      type: 'button',
+      state: 'pressed',
+      label: 'Click Me',
+      bounds: {
+        x: 50,
+        y: 50,
+        width: 150,
+        height: 50
+      },
+    };
+
+    const x = [
+      {
+        type: 'button',
+        state: 'pressed',
+        label: 'Click Me',
+        bounds: {
+          x: 50,
+          y: 50,
+          width: 150,
+          height: 50
+        },
+      },
+      {
+        type: 'button',
+        state: 'pressed',
+        label: 'Click Me',
+        bounds: {
+          x: 50,
+          y: 50,
+          width: 150,
+          height: 50
+        },
+      },
+    ];
+
+    const drawButton = btn => {
+      if (btn.state === 'normal') {
+        ctx.fillStyle = 'blue';
+        ctx.fillRect(btn.bounds.x, btn.bounds.y, btn.bounds.width, btn.bounds.height);
+        ctx.fillStyle = 'white';
+        ctx.font = '20px Arial';
+        ctx.fillText(btn.label, btn.bounds.x + 10, btn.bounds.y + 15);
+      } else if (btn.state === 'hover') {
+        ctx.fillStyle = 'lightblue';
+        ctx.fillRect(btn.bounds.x, btn.bounds.y, btn.bounds.width, btn.bounds.height);
+        ctx.fillStyle = 'white';
+        ctx.font = '20px Arial';
+        ctx.fillText(btn.label, btn.bounds.x + 10, btn.bounds.y + 15);
+      } else if (btn.state === 'pressed') {
+        ctx.fillStyle = 'darkblue';
+        ctx.fillRect(btn.bounds.x, btn.bounds.y, btn.bounds.width, btn.bounds.height);
+        ctx.fillStyle = 'white';
+        ctx.font = '20px Arial';
+        ctx.fillText(btn.label, btn.bounds.x + 10, btn.bounds.y + 15);
+      }
+    };
+    drawButton(button);
+
+
+  </script>
+</body>
+
+</html>

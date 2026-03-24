@@ -50,8 +50,8 @@ export default {
     width: 100%;
     height: 120px;
     background: linear-gradient(135deg, #2c5aa0 0%, #1e7ba6 100%);
-    border-radius: 12px;
-    margin-bottom: 2rem;
+    border-radius: 0;
+    margin: -20px -20px 2rem -20px;
 }
 
 .welcome-section {

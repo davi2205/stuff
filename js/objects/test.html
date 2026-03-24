@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="p-3"></div>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
+    <script src="./grid.js"></script>
+    <script src="./form.js"></script>
+    <script src="./input.js"></script>
+    <script>
+        $(function() {
+            console.log('Testando...');
+            
+            var inputFactory = new InputFactory();
+            var form, input;
+
+            // Form - Dados Básicos
+            form = new Form();
+            
+            input = inputFactory.newTelefoneCelular();
+            input.setLabel('Telefone Celular');
+            form.addItem(input);
+
+            input = inputFactory.newTelefoneFixo();
+            input.setLabel('Telefone Fixo');
+            form.addItem(input);
+
+            input = inputFactory.newTelefoneCelular();
+            input.setLabel('Telefone Celular 2');
+            form.addItem(input);
+
+            input = inputFactory.newTelefoneFixo();
+            input.setLabel('Telefone Fixo 2');
+            form.addItem(input);
+
+            
+            $('body > div').append(form.element());
+        });
+    </script>
+</body>
+</html>

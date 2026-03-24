@@ -34,13 +34,13 @@ static void DVM_StringInit(const char *cStr, DVM_String *str)
     meta->refCount = 0;
 }
 
-static void DVM_StringDispose(DVM_String *str)
+static void DVM_StringDispose(str)
+    DVM_String *str;
 {
     size_t metaOffset = alignSize(str->length, sizeof(DVM_BufferMeta));
     DVM_BufferMeta *meta = (DVM_BufferMeta *)(str->buffer + metaOffset);
-
-    if (meta->refCount > 0)
-    {
+    
+    if (meta->refCount > 0) {
         meta->refCount--;
         return;
     }

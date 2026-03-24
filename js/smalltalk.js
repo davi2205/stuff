@@ -33,6 +33,7 @@ class Tokenizer {
 
             }
 
+
             if (ch >= '0' && ch <= '9') {
 
                 chars.length = 0;
