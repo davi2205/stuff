@@ -1,42 +1,92 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
 </head>
+
 <body>
-    <c-panel>
-        <c-content align="center">
-            <h1>Custom Content Inside Panel</h1>
-            <p>This content is centered within the custom panel component.</p>
-        </c-content>      
-    </c-panel>
     <script>
-        function generateHtml(source) {
-            var template;
-            template = document.createElement('template');
-            template.innerHTML = source;
-            return template.content.cloneNode(true);
+        class XObject {
+            #signalAssociations = new Map();
+
+            signals() {
+                return Array.from(this.#signalAssociations.keys());
+            }
+
+            createSignal(signal) {
+                if (this.#signalAssociations.has(signal)) {
+                    throw new Error(`Signal ${signal} already exists`);
+                }
+                this.#signalAssociations.set(signal, { connections: [] });
+            }
+
+            connectSignal(signal, target, slot) {
+                if (!this.#signalAssociations.has(signal)) {
+                    throw new Error(`Signal ${signal} does not exist`);
+                }
+                const associated = this.#signalAssociations.get(signal);
+                associated.connections.push({ target: new WeakRef(target), slot });
+            }
+
+            emitSignal(signal, ...args) {
+                const associated = this.#signalAssociations.get(signal);
+                if (!associated) {
+                    throw new Error(`Signal ${signal} does not exist`);
+                }
+                for (const [index, { target, slot }] of associated.connections.entries()) {
+                    const derefTarget = target.deref();
+                    if (derefTarget) {
+                        derefTarget[slot](...args);
+                    } else {
+                        associated.connections.splice(index, 1);
+                    }
+                }
+            }
         }
 
-        class Panel extends HTMLElement {
+        class Input extends XObject {
             constructor() {
                 super();
+                this.createSignal('valueChanged');
             }
 
-            connectedCallback() {
-                var root;
-
-                root = generateHtml(`
-                    <div>
-                            
-                    </div>
-                `);
+            set value(value) {
+                this.emitSignal('valueChanged', value);
             }
         }
 
-        customElements.define('c-panel', Panel);
+        new class {
+            constructor() {
+                this.nomeInput = new Input();
+                this.nomeInput.connectSignal('valueChanged', this, 'nomeChanged');
+                this.nomeInput.value = 'Hello, World!';
+
+                this.cnpjInput = new Input();
+                this.cnpjInput.label = 'CNPJ';
+                // ...
+
+                // ...
+                this.model = new Model();
+                this.model.cnpj = '12345678000195';
+                this.model.razao_social = 'Empresa XYZ';
+                this.model.connectSignal('update', this, 'modelUpdated');
+                this.model.emitSignal('update');
+
+                console.log(this.nomeInput.signals());
+            }
+
+            modelUpdated() {
+            }
+
+            nomeChanged(value) {
+
+            }
+        }
+
     </script>
 </body>
+
 </html>

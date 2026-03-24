@@ -6,9 +6,99 @@
     <title>Document</title>
 </head>
 <body>
-   
-    <script type="module">
-        
+    <div data-namespace="foo">
+        <div data-namespace="bar">
+            <div data-namespace="baz">
+                <span>
+                    <button onclick="console.log($(this).namespace().namespaceSelector())">Click me</button>
+                </span>
+            </div>
+        </div>
+    </div> 
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+    <script>
+        $.fn.log = function() {
+            return this.each(function() {
+                console.log(this);
+            });
+        };
+
+        $.fn.namespace = function() {
+            var elements;
+
+            elements = new Array();
+            this.each(function() {
+                var element, namespaceElement;
+                element = this.parentElement;
+                while (!namespaceElement && element) {
+                    if (element.dataset.namespace !== undefined) {
+                        namespaceElement = element;
+                    } else {
+                        element = element.parentElement;
+                    }
+                }
+                if (namespaceElement && !elements.includes(namespaceElement)) {
+                    elements.push(element);
+                }
+            });
+
+            return $(elements);
+        };
+
+        $.fn.namespaceSelector = function(additionalSelector = '') {
+            var selectorParts;
+
+            selectorParts = new Array();
+            this.each(function() {
+                var element;
+                element = this;
+                while (element) {
+                    if (element.dataset.namespace !== undefined) {
+                        selectorParts.unshift(`[data-namespace="${element.dataset.namespace.trim()}"]`);
+                    }
+                    element = element.parentElement;
+                }
+            });
+
+            if (additionalSelector) {
+                selectorParts.push(additionalSelector.trim());
+            }
+
+            return selectorParts.join(' ');
+        };
+
+        // class NameSpace {
+        //     #parts = new Array();
+ 
+        //     static of(element) {
+        //         var path;
+        //         path = new NameSpace();
+        //         while (element) {
+        //             if (element.dataset.namespace !== undefined) {
+        //                 path.#parts.unshift(element.dataset.namespace.trim());
+        //             }
+        //             element = element.parentElement;
+        //         }
+        //         return path;
+        //     }
+
+        //     querySelector(selector = '') {
+        //         return document.body.querySelector(this.selectorPlus(selector));
+        //     }
+
+        //     get selector() {
+        //         return this.selectorPlus('');
+        //     }
+
+        //     selectorPlus(additionalPart) {
+        //         var selectorParts;
+        //         selectorParts =  this.#parts.map(part => `[data-namespace="${part}"]`);
+        //         if (additionalPart) {
+        //             selectorParts.push(additionalPart.trim());
+        //         }
+        //         return selectorParts.join(' ');
+        //     }
+        // }
     </script>
 </body>
 </html>
