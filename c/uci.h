@@ -3,12 +3,16 @@
 
 struct uci_type {
   const char  *name;
+  int          size;
   int        (*msghandler)(int, void*);  
 };
 
-int   uci_init();
-int   uci_createtype(const struct uci_type *type);
-void  uci_test();
+struct uci_component;
+
+int                   uci_init();
+int                   uci_createtype(const struct uci_type *type);
+struct uci_component *uci_create(const char *typename, const char *data);
+void                  uci_test();
 
 
 #endif /* _UCI_H_ */

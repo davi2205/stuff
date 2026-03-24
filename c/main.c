@@ -9,9 +9,14 @@ int test(int message, void *payload) {
 }
 
 int main(int argc, char **argv) {
+  struct uci_component *comp;
   uci_init();
-  uci_createtype(&(struct uci_type) { .name = "example", .msghandler = test });
+  uci_createtype(&(struct uci_type) {
+    .name = "ucix/button",
+    .msghandler = test,
+    .size = 23
+  });
+  comp = uci_create("ucix/button", NULL);
   uci_test();
-  system("pause");
   return 0;
 }
