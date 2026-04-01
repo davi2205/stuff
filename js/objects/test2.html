@@ -4,77 +4,46 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Document</title>
+  <title>Leaflet Marker Example</title>
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+    crossorigin=""
+  />
+  <style>
+    html,
+    body {
+      height: 100%;
+      margin: 0;
+    }
+
+    #map {
+      width: 100%;
+      height: 100%;
+    }
+  </style>
 </head>
 
 <body>
-  <canvas id="screen"></canvas>
+  <div id="map"></div>
+  <script
+    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+    crossorigin=""
+  ></script>
   <script>
-    const canvas = document.getElementById('screen');
-    const ctx = canvas.getContext('2d');
-    ctx.textBaseline = 'top';
+    const map = L.map('map').setView([-23.5505, -46.6333], 13);
 
-    const button = {
-      type: 'button',
-      state: 'pressed',
-      label: 'Click Me',
-      bounds: {
-        x: 50,
-        y: 50,
-        width: 150,
-        height: 50
-      },
-    };
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
 
-    const x = [
-      {
-        type: 'button',
-        state: 'pressed',
-        label: 'Click Me',
-        bounds: {
-          x: 50,
-          y: 50,
-          width: 150,
-          height: 50
-        },
-      },
-      {
-        type: 'button',
-        state: 'pressed',
-        label: 'Click Me',
-        bounds: {
-          x: 50,
-          y: 50,
-          width: 150,
-          height: 50
-        },
-      },
-    ];
-
-    const drawButton = btn => {
-      if (btn.state === 'normal') {
-        ctx.fillStyle = 'blue';
-        ctx.fillRect(btn.bounds.x, btn.bounds.y, btn.bounds.width, btn.bounds.height);
-        ctx.fillStyle = 'white';
-        ctx.font = '20px Arial';
-        ctx.fillText(btn.label, btn.bounds.x + 10, btn.bounds.y + 15);
-      } else if (btn.state === 'hover') {
-        ctx.fillStyle = 'lightblue';
-        ctx.fillRect(btn.bounds.x, btn.bounds.y, btn.bounds.width, btn.bounds.height);
-        ctx.fillStyle = 'white';
-        ctx.font = '20px Arial';
-        ctx.fillText(btn.label, btn.bounds.x + 10, btn.bounds.y + 15);
-      } else if (btn.state === 'pressed') {
-        ctx.fillStyle = 'darkblue';
-        ctx.fillRect(btn.bounds.x, btn.bounds.y, btn.bounds.width, btn.bounds.height);
-        ctx.fillStyle = 'white';
-        ctx.font = '20px Arial';
-        ctx.fillText(btn.label, btn.bounds.x + 10, btn.bounds.y + 15);
-      }
-    };
-    drawButton(button);
-
-
+    L.marker([-23.5505, -46.6333])
+      .addTo(map)
+      .bindPopup('Marker in Sao Paulo')
+      .openPopup();
   </script>
 </body>
 
