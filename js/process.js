@@ -127,11 +127,82 @@ Process.prototype.receive = function (message, payload) {
 // -----------------------------
 function RemoteProcess() {
   Process.call(this);
+  this._url = null;
+  this._counter = 0;
+  this._pending = new Array();
+  this._dispatchRequest = null;
 }
 
 RemoteProcess.prototype = new Process;
 RemoteProcess.prototype.constructor = RemoteProcess;
 
-RemoteProcess.prototype.receive = function (message, payload) {
-  //
+RemoteProcess.prototype.requestDispatch = function () {
+  var self;
+  if (this._dispatchRequest) {
+    return;
+  }
+  self = this;
+  this._dispatchRequest = setTimeout(function () {
+    var xhr;
+    xhr = new XMLHttpRequest();
+    xhr.open('POST', self._url, true);
+    xhr.setRequestHeader('Content-Type', 'application/json');
+    xhr.onreadystatechange = function () {
+      var response, i, pending;
+      if (xhr.readyState == XMLHttpRequest.DONE) {
+        if (xhr.status == 200) {
+          response = JSON.parse(xhr.responseText);
+          if (response && response.pending) {
+            for (i = 0; i < response.pending.length; i++) {
+              pending = response.pending[i];
+              self.send(pending.receiver, pending.message, pending.payload);
+            }
+          }
+        } else {
+          console.error('Failed to send message');
+        }
+      }
+    };
+    xhr.send(JSON.stringify({ pending: self._pending }));
+    self._pending.length = 0;
+    self._dispatchRequest = null;
+  }, 0);
 };
+
+RemoteProcess.prototype.receive = function (message, payload) {
+  var xhr;
+  switch (message) {
+    case 'setup': {
+      this._url = payload;
+      break;
+    } 
+    default: {
+      this._pending.push({
+        sender: this.sender(),
+        receiver: this.name(),
+        message: message,
+        payload: payload
+      });
+      this.requestDispatch();
+      break;
+    }
+  }
+};
+
+// -----------------------------
+function LogProcess() {
+  Process.call(this);
+}
+
+LogProcess.prototype = new Process;
+LogProcess.prototype.constructor = LogProcess;
+
+LogProcess.prototype.receive = function (message, payload) {
+  console.log('Received message:', message, 'with payload:', payload);
+};
+
+var remote, log;
+remote = ProcessRuntime.spawn(RemoteProcess);
+log = ProcessRuntime.spawn(LogProcess);
+ProcessRuntime.send(remote, 'setup', 'http://localhost:8000/process.php');
+ProcessRuntime.send(remote, 'testMessage', { replyTo: log });
