@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <link rel="stylesheet" href="vendor/bootstrap/css/bootstrap.min.css">
+</head>
+
+<body>
+  <script src="vendor/jquery/jquery.min.js"></script>
+  <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="lib/common.js"></script>
+  <script src="lib/ui.js"></script>
+  <script>
+    var grid;
+    grid = lib.createGrid(
+      /*id*/ null,
+      /*grid*/ [
+        [6, 6],
+        [6, 6],
+      ]
+    );
+    lib.putChild(grid, lib.createInput(null, 'Teste'));
+    lib.putChild(grid, lib.createInput(null, 'Teste 3'));
+  </script>
+</body>
+
+</html>

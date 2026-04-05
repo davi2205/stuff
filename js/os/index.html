@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <link rel="stylesheet" href="jquery.widgets.css">
+  <script src="jquery.min.js"></script>
+  <script src="jquery.widgets.js"></script>
+  <script>
+    $(function () {
+      var $root;
+      $root = $('#window');
+      $root
+        .createWidget('window')
+        .widget('bounds', 100, 100, 400, 300)
+        .on('widget:boundsChanged', function (e) {
+          if (e.target !== this) {
+            return;
+          }
+          layout();
+        });
+
+      $root.find('button').createWidget('button');
+
+      function layout() {
+        var rootBounds;
+        rootBounds = $root.widget('bounds');
+        $root
+          .find('button')
+          .widget('bounds', rootBounds.width - 75, rootBounds.height - 65, 70, 30);
+      }
+      layout();
+    });
+  </script>
+</head>
+<body>
+  <div id="window" data-title="My title">
+    <button>Click me</button>
+  </div>
+</body>
+</html>
