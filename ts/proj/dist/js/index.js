@@ -6,12 +6,13 @@ class MyWindow extends WindowWidget {
         var w;
         super();
         this.layout = new Layout();
-        this.layout.setGapSize(5);
-        this.layout.setPadding(0);
+        this.layout.setGapSize(10);
+        this.layout.setPadding(10);
         w = new WindowWidget();
         w.setTitle("Child Window");
         w.setBounds(0, 0, 200, 100);
         this.add(w);
+        this.layout.setItemXFillFactor(w, 1);
         w = new WindowWidget();
         w.setTitle("Child Window");
         w.setBounds(0, 0, 100, 450);
@@ -26,10 +27,12 @@ class MyWindow extends WindowWidget {
         w.setTitle("Child Window");
         w.setBounds(0, 0, 200, 100);
         this.add(w);
+        this.layout.setItemXFillFactor(w, 1);
         w = new WindowWidget();
         w.setTitle("Child Window");
         w.setBounds(0, 0, 200, 100);
         this.add(w);
+        this.layout.setItemXFillFactor(w, 1);
     }
     setBounds(x, y, width, height) {
         super.setBounds(x, y, width, height);
@@ -45,4 +48,5 @@ const myWindow = new MyWindow();
 myWindow.setTitle("My Window");
 myWindow.setBounds(100, 100, 1000, 600);
 document.body.appendChild(myWindow.getHtmlElement());
+window.myWindow = myWindow;
 //# sourceMappingURL=index.js.map
