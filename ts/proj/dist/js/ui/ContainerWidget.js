@@ -21,5 +21,18 @@ export class ContainerWidget extends Widget {
         }
         this.items.splice(index, 1);
     }
+    findByClass(_class) {
+        var result = [];
+        var item;
+        for (item of this.items) {
+            if (item.constructor === _class) {
+                result.push(item);
+            }
+            if (item instanceof ContainerWidget) {
+                result.push(...item.findByClass(_class));
+            }
+        }
+        return result;
+    }
 }
 //# sourceMappingURL=ContainerWidget.js.map

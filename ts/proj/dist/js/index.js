@@ -1,38 +1,31 @@
 import { Layout } from "./ui/Layout.js";
-import { WindowWidget } from "./ui/WindowWidget.js";
-class MyWindow extends WindowWidget {
+import { Frame } from "./ui/Frame.js";
+import { Button } from "./ui/Button.js";
+import { YAlignment } from "./ui/YAlignment.js";
+import { RootWidget } from "./ui/RootWidget.js";
+class MyWindow extends Frame {
     layout;
     constructor() {
         var w;
         super();
         this.layout = new Layout();
-        this.layout.setGapSize(10);
-        this.layout.setPadding(10);
-        w = new WindowWidget();
-        w.setTitle("Child Window");
-        w.setBounds(0, 0, 200, 100);
+        this.layout.setGapSize(5);
+        this.layout.setPadding(5);
+        w = new Button();
+        w.setLabel("Ok");
+        w.setSizeToSuggested();
         this.add(w);
-        this.layout.setItemXFillFactor(w, 1);
-        w = new WindowWidget();
-        w.setTitle("Child Window");
-        w.setBounds(0, 0, 100, 450);
+        this.layout.setItemYAlignment(w, YAlignment.Bottom);
+        w = new Button();
+        w.setLabel("Cancel");
+        w.setSizeToSuggested();
         this.add(w);
-        this.layout.setItemXFillFactor(w, 1);
-        w = new WindowWidget();
-        w.setTitle("Child Window");
-        w.setBounds(0, 0, 100, 350);
+        this.layout.setItemYAlignment(w, YAlignment.Bottom);
+        w = new Button();
+        w.setLabel("Help");
+        w.setSizeToSuggested();
         this.add(w);
-        this.layout.setItemXFillFactor(w, 1);
-        w = new WindowWidget();
-        w.setTitle("Child Window");
-        w.setBounds(0, 0, 200, 100);
-        this.add(w);
-        this.layout.setItemXFillFactor(w, 1);
-        w = new WindowWidget();
-        w.setTitle("Child Window");
-        w.setBounds(0, 0, 200, 100);
-        this.add(w);
-        this.layout.setItemXFillFactor(w, 1);
+        this.layout.setItemYAlignment(w, YAlignment.Bottom);
     }
     setBounds(x, y, width, height) {
         super.setBounds(x, y, width, height);
@@ -45,8 +38,10 @@ class MyWindow extends WindowWidget {
     }
 }
 const myWindow = new MyWindow();
-myWindow.setTitle("My Window");
+myWindow.setLabel("My Window");
 myWindow.setBounds(100, 100, 1000, 600);
-document.body.appendChild(myWindow.getHtmlElement());
-window.myWindow = myWindow;
+RootWidget.getInstance().add(myWindow);
+document.body.appendChild(RootWidget.getInstance().getHtmlElement());
+window.RootWidget = RootWidget;
+window.MyWindow = MyWindow;
 //# sourceMappingURL=index.js.map

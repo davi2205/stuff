@@ -1,48 +1,39 @@
 import { Layout } from "./ui/Layout.js";
 import { Widget } from "./ui/Widget.js";
-import { WindowWidget } from "./ui/WindowWidget.js";
+import { Frame } from "./ui/Frame.js";
+import { Button } from "./ui/Button.js";
+import { YAlignment } from "./ui/YAlignment.js";
+import { RootWidget } from "./ui/RootWidget.js";
 
-class MyWindow extends WindowWidget {
+class MyWindow extends Frame {
   layout: Layout;
 
   constructor() {
-    var w: WindowWidget;
+    var w: Frame | Button;
 
     super();
 
     this.layout = new Layout();
-    this.layout.setGapSize(10);
-    this.layout.setPadding(10);
+    this.layout.setGapSize(5);
+    this.layout.setPadding(5);
 
-    w = new WindowWidget();
-    w.setTitle("Child Window");
-    w.setBounds(0, 0, 200, 100);
+    w = new Button();
+    w.setLabel("Ok");
+    w.setSizeToSuggested();
     this.add(w);
-    this.layout.setItemXFillFactor(w, 1);
+    this.layout.setItemYAlignment(w, YAlignment.Bottom);
 
-    w = new WindowWidget();
-    w.setTitle("Child Window");
-    w.setBounds(0, 0, 100, 450);
+    w = new Button();
+    w.setLabel("Cancel");
+    w.setSizeToSuggested();
     this.add(w);
-    this.layout.setItemXFillFactor(w, 1);
+    this.layout.setItemYAlignment(w, YAlignment.Bottom);
 
-    w = new WindowWidget();
-    w.setTitle("Child Window");
-    w.setBounds(0, 0, 100, 350);
+    w = new Button();
+    w.setLabel("Help");
+    w.setSizeToSuggested();
     this.add(w);
-    this.layout.setItemXFillFactor(w, 1);
-
-    w = new WindowWidget();
-    w.setTitle("Child Window");
-    w.setBounds(0, 0, 200, 100);
-    this.add(w);
-    this.layout.setItemXFillFactor(w, 1);
-
-    w = new WindowWidget();
-    w.setTitle("Child Window");
-    w.setBounds(0, 0, 200, 100);
-    this.add(w);
-    this.layout.setItemXFillFactor(w, 1);
+    this.layout.setItemYAlignment(w, YAlignment.Bottom);
   }
 
   setBounds(x: number, y: number, width: number, height: number): void {
@@ -54,14 +45,17 @@ class MyWindow extends WindowWidget {
 
   add(widget: Widget): void {
     super.add(widget);
-
     this.layout.add(widget);
   }
 }
 
-const myWindow = new MyWindow();
-myWindow.setTitle("My Window");
-myWindow.setBounds(100, 100, 1000, 600);
-document.body.appendChild(myWindow.getHtmlElement());
 
-(window as any).myWindow = myWindow;
+const myWindow = new MyWindow();
+myWindow.setLabel("My Window");
+myWindow.setBounds(100, 100, 1000, 600);
+RootWidget.getInstance().add(myWindow);
+
+document.body.appendChild(RootWidget.getInstance().getHtmlElement());
+
+(window as any).RootWidget = RootWidget;
+(window as any).MyWindow = MyWindow;

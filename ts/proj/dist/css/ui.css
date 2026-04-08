@@ -1,11 +1,83 @@
 
+.resizer-top {
+  position: absolute;
+  top: -5px;
+  left: 5px;
+  right: 5px;
+  height: 10px;
+  cursor: ns-resize;
+}
+
+.resizer-right {
+  position: absolute;
+  top: 5px;
+  right: -5px;
+  width: 10px;
+  bottom: 5px;
+  cursor: ew-resize;
+}
+
+.resizer-bottom {
+  position: absolute;
+  left: 5px;
+  right: 5px;
+  bottom: -5px;
+  height: 10px;
+  cursor: ns-resize;
+}
+
+.resizer-left {
+  position: absolute;
+  top: 5px;
+  left: -5px;
+  width: 10px;
+  bottom: 5px;
+  cursor: ew-resize;
+}
+
+.resizer-top-left {
+  position: absolute;
+  top: -5px;
+  left: -5px;
+  width: 10px;
+  height: 10px;
+  cursor: nwse-resize;
+}
+
+.resizer-top-right {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  width: 10px;
+  height: 10px;
+  cursor: nesw-resize;
+}
+
+.resizer-bottom-left {
+  position: absolute;
+  bottom: -5px;
+  left: -5px;
+  width: 10px;
+  height: 10px;
+  cursor: nesw-resize;
+}
+
+.resizer-bottom-right {
+  position: absolute;
+  bottom: -5px;
+  right: -5px;
+  width: 10px;
+  height: 10px;
+  cursor: nwse-resize;
+}
+
 .window {
   position: absolute;
   border: 1px solid black;
   box-sizing: border-box;
 }
 
-.window-title {
+.window-label {
   position: absolute;
   top: 0px;
   left: 0px;
@@ -23,10 +95,13 @@
   background-color: #fff;
 }
 
-/*
+.button {
+  position: absolute;
+}
+
 
 .window,
-.window-title,
+.window-label,
 .window-content {
   box-sizing: border-box;
 }
@@ -45,10 +120,10 @@ body {
   border-radius: 16px;
   overflow: hidden;
   background: linear-gradient(180deg, #fdfefe 0%, #eef4ff 100%);
-  box-shadow: 5px 5px 5px rgba(53, 77, 117, 0.24), 0 6px 14px rgba(53, 77, 117, 0.18);
+  box-shadow: 2px 2px 1px rgba(53, 77, 117, 0.24), 0 6px 14px rgba(53, 77, 117, 0.18);
 }
 
-.window-title {
+.window-label {
   position: absolute;
   top: 0px;
   left: 0px;
@@ -73,4 +148,15 @@ body {
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.96) 0%, rgba(236, 244, 255, 0.92) 100%);
 }
-*/
+
+.button {
+  box-sizing: border-box;
+  position: absolute;
+  border: 1px solid #7c8aa6;
+  border-radius: 8px;
+  background: linear-gradient(180deg, #fdfefe 0%, #eef4ff 100%);
+  box-shadow: 2px 2px 1px rgba(53, 77, 117, 0.24), 0 6px 14px rgba(53, 77, 117, 0.18);
+  padding: 10px;
+  padding-top: 8px;
+  padding-bottom: 8px;
+}

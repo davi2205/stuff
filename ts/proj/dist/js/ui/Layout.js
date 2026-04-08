@@ -1,3 +1,5 @@
+import { XAlignment } from "./XAlignment.js";
+import { YAlignment } from "./YAlignment.js";
 export class Layout {
     x = 0;
     y = 0;
@@ -91,8 +93,7 @@ export class Layout {
         var totalFillFactor;
         var i, len;
         var entry;
-        var currentY;
-        var itemHeight;
+        var itemX, itemY, itemWidth, itemHeight;
         if (this.entries.length === 0) {
             return;
         }
@@ -112,7 +113,7 @@ export class Layout {
             }
         }
         totalHeightToFill = Math.max(0, totalHeightToFill);
-        currentY = resolvedY;
+        itemY = resolvedY;
         for (i = 0, len = this.entries.length; i < len; i++) {
             entry = this.entries[i];
             if (entry.yFillFactor !== null) {
@@ -121,8 +122,21 @@ export class Layout {
             else {
                 itemHeight = entry.item.getHeight();
             }
-            entry.item.setBounds(resolvedX, currentY, entry.item.getWidth(), itemHeight);
-            currentY += itemHeight + this.gapSize;
+            if (entry.xFillFactor !== null) {
+                itemWidth = resolvedWidth * Math.max(0, Math.min(1, entry.xFillFactor));
+            }
+            else {
+                itemWidth = entry.item.getWidth();
+            }
+            itemX = resolvedX;
+            if (entry.xAlignment === XAlignment.Center) {
+                itemX += (resolvedWidth - itemWidth) / 2;
+            }
+            else if (entry.xAlignment === XAlignment.Right) {
+                itemX += resolvedWidth - itemWidth;
+            }
+            entry.item.setBounds(itemX, itemY, itemWidth, itemHeight);
+            itemY += itemHeight + this.gapSize;
         }
     }
     doRowLayout() {
@@ -131,8 +145,7 @@ export class Layout {
         var totalFillFactor;
         var i, len;
         var entry;
-        var currentX;
-        var itemWidth;
+        var itemX, itemY, itemWidth, itemHeight;
         if (this.entries.length === 0) {
             return;
         }
@@ -152,7 +165,7 @@ export class Layout {
             }
         }
         totalWidthToFill = Math.max(0, totalWidthToFill);
-        currentX = resolvedX;
+        itemX = resolvedX;
         for (i = 0, len = this.entries.length; i < len; i++) {
             entry = this.entries[i];
             if (entry.xFillFactor !== null) {
@@ -161,15 +174,28 @@ export class Layout {
             else {
                 itemWidth = entry.item.getWidth();
             }
-            entry.item.setBounds(currentX, resolvedY, itemWidth, entry.item.getHeight());
-            currentX += itemWidth + this.gapSize;
+            if (entry.yFillFactor !== null) {
+                itemHeight = resolvedHeight * Math.max(0, Math.min(1, entry.yFillFactor));
+            }
+            else {
+                itemHeight = entry.item.getHeight();
+            }
+            itemY = resolvedY;
+            if (entry.yAlignment === YAlignment.Center) {
+                itemY += (resolvedHeight - itemHeight) / 2;
+            }
+            else if (entry.yAlignment === YAlignment.Bottom) {
+                itemY += resolvedHeight - itemHeight;
+            }
+            entry.item.setBounds(itemX, itemY, itemWidth, itemHeight);
+            itemX += itemWidth + this.gapSize;
         }
     }
 }
 class LayoutEntry {
     item;
-    xAlignment = "left";
-    yAlignment = "top";
+    xAlignment = XAlignment.Left;
+    yAlignment = YAlignment.Top;
     xFillFactor = null;
     yFillFactor = null;
     expanded = false;
