@@ -8,7 +8,7 @@ export class Button extends Widget {
         this.element = document.createElement("button");
         this.element.className = 'button';
         this.element.textContent = this.label;
-        this.setSizeToSuggested();
+        this.useSuggestedSize();
     }
     getLabel() {
         return this.label;
@@ -30,7 +30,7 @@ export class Button extends Widget {
         this.element.style.width = `${width}px`;
         this.element.style.height = `${height}px`;
     }
-    setSizeToSuggested() {
+    useSuggestedSize() {
         this.setBounds(this.getX(), this.getY(), this.getSuggestedWidth(), this.getSuggestedHeight());
     }
     getSuggestClientRect() {

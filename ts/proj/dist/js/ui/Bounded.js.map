@@ -1,1 +1,1 @@
-{"version":3,"file":"Bounded.js","sourceRoot":"","sources":["../../../src/ui/Bounded.ts"],"names":[],"mappings":""}
+{"version":3,"file":"Bounded.js","sourceRoot":"","sources":["../../../src/ui/Bounded.ts"],"names":[],"mappings":"AASA,MAAM,UAAU,SAAS,CAAC,MAAW;IACnC,OAAO,OAAO,MAAM,CAAC,IAAI,KAAK,UAAU;QACjC,OAAO,MAAM,CAAC,IAAI,KAAK,UAAU;QACjC,OAAO,MAAM,CAAC,QAAQ,KAAK,UAAU;QACrC,OAAO,MAAM,CAAC,SAAS,KAAK,UAAU;QACtC,OAAO,MAAM,CAAC,SAAS,KAAK,UAAU,CAAC;AAChD,CAAC"}

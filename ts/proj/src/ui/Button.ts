@@ -13,7 +13,7 @@ export class Button extends Widget implements HtmlBacked {
     this.element.className = 'button';
     this.element.textContent = this.label;
 
-    this.setSizeToSuggested();
+    this.useSuggestedSize();
   }
 
   getLabel(): string {
@@ -41,7 +41,7 @@ export class Button extends Widget implements HtmlBacked {
     this.element.style.height = `${height}px`;
   }
 
-  setSizeToSuggested(): void {
+  useSuggestedSize(): void {
     this.setBounds(this.getX(), this.getY(), this.getSuggestedWidth(), this.getSuggestedHeight());
   }
 

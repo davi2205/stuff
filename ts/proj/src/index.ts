@@ -4,12 +4,13 @@ import { Frame } from "./ui/Frame.js";
 import { Button } from "./ui/Button.js";
 import { YAlignment } from "./ui/YAlignment.js";
 import { RootWidget } from "./ui/RootWidget.js";
+import { Scrollbar } from "./ui/Scrollbar.js";
 
 class MyWindow extends Frame {
   layout: Layout;
 
   constructor() {
-    var w: Frame | Button;
+    var w: Frame | Button | Scrollbar;
 
     super();
 
@@ -19,21 +20,21 @@ class MyWindow extends Frame {
 
     w = new Button();
     w.setLabel("Ok");
-    w.setSizeToSuggested();
+    w.useSuggestedSize();
     this.add(w);
     this.layout.setItemYAlignment(w, YAlignment.Bottom);
 
     w = new Button();
     w.setLabel("Cancel");
-    w.setSizeToSuggested();
+    w.useSuggestedSize();
     this.add(w);
     this.layout.setItemYAlignment(w, YAlignment.Bottom);
 
-    w = new Button();
-    w.setLabel("Help");
-    w.setSizeToSuggested();
+    w = new Scrollbar();
+    w.setBounds(0, 0, 32, 200);
     this.add(w);
     this.layout.setItemYAlignment(w, YAlignment.Bottom);
+    this.layout.setItemYFillFactor(w, 1);
   }
 
   setBounds(x: number, y: number, width: number, height: number): void {

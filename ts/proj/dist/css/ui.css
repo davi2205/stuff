@@ -100,6 +100,63 @@
 }
 
 
+.scrollbar {
+  position: absolute;
+}
+
+.scrollbar-vertical .scrollbar-arrow-start::before {
+  content: '▲';
+}
+
+.scrollbar-vertical .scrollbar-arrow-end::before {
+  content: '▼';
+}
+
+.scrollbar-horizontal .scrollbar-arrow-start::before {
+  content: '◀';
+}
+
+.scrollbar-horizontal .scrollbar-arrow-end::before {
+  content: '▶';
+}
+
+.scrollbar-vertical .scrollbar-arrow-start {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  right: 0px;
+  height: 32px;
+}
+
+.scrollbar-vertical .scrollbar-arrow-end {
+  position: absolute;
+  bottom: 0px;
+  left: 0px;
+  right: 0px;
+  height: 32px;
+}
+
+.scrollbar-vertical .scrollbar-track {
+  position: absolute;
+  top: 32px;
+  left: 0px;
+  right: 0px;
+  bottom: 32px;
+}
+
+.scrollbar-vertical .scrollbar-thumb {
+  position: absolute;
+}
+
+.scrollbar-arrow {
+  box-sizing: border-box;
+  position: absolute;
+  border: 1px solid #7c8aa6;
+  border-radius: 8px;
+  background: linear-gradient(180deg, #fdfefe 0%, #eef4ff 100%);
+  box-shadow: 2px 2px 1px rgba(53, 77, 117, 0.24), 0 6px 14px rgba(53, 77, 117, 0.18);
+}
+
 .window,
 .window-label,
 .window-content {
