@@ -1,4 +1,4 @@
-export function isHtmlBacked(obj) {
+export function isHTMLBacked(obj) {
     return typeof obj.getHtmlElement === "function";
 }
-//# sourceMappingURL=HtmlBacked.js.map
+//# sourceMappingURL=HTMLBacked.js.map

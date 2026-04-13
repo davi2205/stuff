@@ -1,7 +1,7 @@
-import { HtmlBacked } from "./HtmlBacked.js";
+import { HTMLBacked } from "./HTMLBacked.js";
 import { Widget } from "./Widget.js";
 
-export class Button extends Widget implements HtmlBacked {
+export class Button extends Widget implements HTMLBacked {
   private label: string;
   private element: HTMLElement;
   

@@ -5,6 +5,7 @@ import { Button } from "./ui/Button.js";
 import { YAlignment } from "./ui/YAlignment.js";
 import { RootWidget } from "./ui/RootWidget.js";
 import { Scrollbar } from "./ui/Scrollbar.js";
+import { Orientation } from "./ui/Orientation.js";
 
 class MyWindow extends Frame {
   layout: Layout;
@@ -31,10 +32,19 @@ class MyWindow extends Frame {
     this.layout.setItemYAlignment(w, YAlignment.Bottom);
 
     w = new Scrollbar();
-    w.setBounds(0, 0, 32, 200);
+    w.setOrientation(Orientation.Horizontal);
+    w.setBounds(0, 0, 200, 26);
+    this.add(w);
+    this.layout.setItemYAlignment(w, YAlignment.Bottom);
+    this.layout.setItemXFillFactor(w, 1);
+
+    w = new Scrollbar();
+    w.setBounds(0, 0, 26, 200);
     this.add(w);
     this.layout.setItemYAlignment(w, YAlignment.Bottom);
     this.layout.setItemYFillFactor(w, 1);
+
+   
   }
 
   setBounds(x: number, y: number, width: number, height: number): void {

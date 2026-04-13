@@ -1,5 +1,5 @@
 import { ContainerWidget } from "./ContainerWidget.js";
-import { isHtmlBacked } from "./HtmlBacked.js";
+import { isHTMLBacked } from "./HTMLBacked.js";
 export class RootWidget extends ContainerWidget {
     element;
     static getInstance() {
@@ -14,13 +14,13 @@ export class RootWidget extends ContainerWidget {
     }
     add(widget) {
         super.add(widget);
-        if (isHtmlBacked(widget)) {
+        if (isHTMLBacked(widget)) {
             this.element.appendChild(widget.getHtmlElement());
         }
     }
     remove(widget) {
         super.remove(widget);
-        if (isHtmlBacked(widget)) {
+        if (isHTMLBacked(widget)) {
             this.element.removeChild(widget.getHtmlElement());
         }
     }

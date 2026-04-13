@@ -1,8 +1,8 @@
 
-export interface HtmlBacked {
+export interface HTMLBacked {
   getHtmlElement(): HTMLElement;
 }
 
-export function isHtmlBacked(obj: any): obj is HtmlBacked {
+export function isHTMLBacked(obj: any): obj is HTMLBacked {
   return typeof obj.getHtmlElement === "function";
 }

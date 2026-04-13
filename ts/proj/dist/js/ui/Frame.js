@@ -1,5 +1,5 @@
 import { ContainerWidget } from "./ContainerWidget.js";
-import { isHtmlBacked } from "./HtmlBacked.js";
+import { isHTMLBacked } from "./HTMLBacked.js";
 export class Frame extends ContainerWidget {
     label;
     element;
@@ -45,7 +45,7 @@ export class Frame extends ContainerWidget {
     add(widget) {
         var contentElement;
         super.add(widget);
-        if (isHtmlBacked(widget)) {
+        if (isHTMLBacked(widget)) {
             contentElement = this.element.querySelector(".window-content");
             if (contentElement) {
                 contentElement.appendChild(widget.getHtmlElement());
@@ -55,7 +55,7 @@ export class Frame extends ContainerWidget {
     remove(widget) {
         var contentElement;
         super.remove(widget);
-        if (isHtmlBacked(widget)) {
+        if (isHTMLBacked(widget)) {
             contentElement = this.element.querySelector(".window-content");
             if (contentElement) {
                 contentElement.removeChild(widget.getHtmlElement());

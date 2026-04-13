@@ -1,8 +1,8 @@
 import { ContainerWidget } from "./ContainerWidget.js";
-import { HtmlBacked, isHtmlBacked } from "./HtmlBacked.js";
+import { HTMLBacked, isHTMLBacked } from "./HTMLBacked.js";
 import { Widget } from "./Widget.js";
 
-export class RootWidget extends ContainerWidget implements HtmlBacked {
+export class RootWidget extends ContainerWidget implements HTMLBacked {
   element: HTMLElement;
 
   static getInstance(): RootWidget {
@@ -22,7 +22,7 @@ export class RootWidget extends ContainerWidget implements HtmlBacked {
   add(widget: Widget): void {
     super.add(widget);
 
-    if (isHtmlBacked(widget)) {
+    if (isHTMLBacked(widget)) {
       this.element.appendChild(widget.getHtmlElement());
     }
   }
@@ -30,7 +30,7 @@ export class RootWidget extends ContainerWidget implements HtmlBacked {
   remove(widget: Widget): void {
     super.remove(widget);
 
-    if (isHtmlBacked(widget)) {
+    if (isHTMLBacked(widget)) {
       this.element.removeChild(widget.getHtmlElement());
     }
   }
