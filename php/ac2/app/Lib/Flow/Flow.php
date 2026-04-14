@@ -3,126 +3,100 @@
 namespace App\Lib\Flow;
 
 abstract class Flow {
-  private ?string $start = null;
-  private ?string $end = null;
-  /**
-   * @var FlowEdge[] $edges
-   */
+  /** @var FlowPoint[] */
+  private array $points = [];
+  /** @var FlowEdge[]  */
   private array $edges = [];
-  private mixed $data = null;
 
-  public function getStart(): ?string {
-    return $this->start;
-  }
-
-  protected function setStart(string $point): static {
-    if (!$this->pointExists($point)) {
-      throw new \Exception("Undefined point \"$point\"");
+  protected function setStartPoint(mixed $name): void {
+    foreach ($this->points as $point) {
+      if ($point->getName() === $name) {
+        $point->setAsStart();
+        return;
+      }
     }
-    $this->start = $point;
-    return $this;
+    throw new \Exception("Point '$name' does not exist in the flow.");
   }
 
-  public function getEnd(): ?string {
-    return $this->end;
-  }
-
-  public function setEnd(string $point): static {
-    if (!$this->pointExists($point)) {
-      throw new \Exception("Undefined point \"$point\"");
+  protected function setEndPoint(mixed $name): void {
+    foreach ($this->points as $point) {
+      if ($point->getName() === $name) {
+        $point->setAsEnd();
+        return;
+      }
     }
-    $this->end = $point;
-    return $this;
+    throw new \Exception("Point '$name' does not exist in the flow.");
   }
 
-  public function pointExists(string $point): bool {
-    return method_exists($this, $point);
+  protected function defineEdge(mixed $name, mixed $from, mixed $to): void {
+    $edgeExists = function (mixed $name, FlowPoint $from, FlowPoint $to) {
+      foreach ($this->edges as $edge) {
+        if ($edge->getName() === $name && $edge->getFrom() === $from && $edge->getTo() === $to) {
+          return true;
+        }
+      }
+      return false;
+    };
+
+    $providePoint = function (mixed $name) {
+      foreach ($this->points as $point) {
+        if ($point->getName() === $name) {
+          return $point;
+        }
+      }
+      if (!method_exists($this, $name)) {
+        throw new \Exception("Method '$name' does not exist in the flow class.");
+      }
+      $point = new FlowPoint($name, function() use ($name) { return $this->{$name}(); });
+      array_push($this->points, $point);
+      return $point;
+    };
+
+    $fromPoint = $providePoint($from);
+    $toPoint = $providePoint($to);
+    if ($edgeExists($name, $fromPoint, $toPoint)) {
+      throw new \Exception("Edge '$name' from '{$fromPoint->getName()}' to '{$toPoint->getName()}' already exists in the flow.");
+    }
+    array_push($this->edges, new FlowEdge($name, $fromPoint, $toPoint));
   }
 
-  protected function getEdges(): array {
-    return $this->edges;
-  }
-
-  /**
-   * @return FlowEdge[]
-   */
-  protected function getEdgesFrom(string $from): array {
+  protected function edgesFrom(mixed $pointName): array {
     $edges = [];
     foreach ($this->edges as $edge) {
-      if ($_from === $from) {
-        array_push($edges, $edge);
+      if ($edge->getFrom()->getName() === $pointName) {
+        array_push($edges, [$edge->getName(), $edge->getTo()->getName()]);
       }
     }
     return $edges;
   }
 
-//   public function edgeExists(string $from, string $to): bool {
-//     foreach ($this->edges as $edge) {
-//       if ($edge->from === $from && $edge->to === $to) {
-//         return true;
-//       }
-//     }
-//     return false;
-//   }
-
-  public function addEdge(string $from, string $to, mixed $value = null): static {
-    // if ($this->edgeExists($from, $to)) {
-    //   throw new \Exception("Edge already exists \"$from\" => \"$to\"");
-    // }
-    if (!$this->pointExists($from)) {
-      throw new \Exception("Undefined point \"$from\"");
-    }
-    if (!$this->pointExists($to)) {
-      throw new \Exception("Undefined point \"$to\"");
-    }
-    array_push($this->edges, new FlowEdge($from, $to, $value));
-    return $this;
-  }
-
-  public function getData(): mixed {
-    return $this->data;
-  }
-
-  protected function setData(mixed $data): static {
-    $this->data = $data;
-    return $this;
-  }
-
-  public function start(mixed $data): static {
-    return $this->startFrom($this->start, $data);
-  }
-
-  public function startFrom(string $point, mixed $data): static {
-    if (!$this->pointExists($point)) {
-      throw new \Exception("Undefined point \"$point\"");
-    }
+  public function startFrom(string $point, mixed $data): void {
     $this->checkSanity();
-    for (;;) {
-      $edgeValue = $this->{$point}();
-      if ($this->getEnd() === $point) {
-        return $this;
-      }
-      $edges = $this->getEdgesFrom($point);
-      $nextPoint = null;
-      foreach ($edges as $edge) {
-        if ($edge->value === $edgeValue) {
-          $nextPoint = $edge->to;
-          break;
-        }
-      }
-      if ($nextPoint === null) {
-        throw new \Exception("No valid continuation from point \"$point\"");
-      }
-      $point = $nextPoint;
-    }
+
   }
 
   protected function checkSanity(): void {
-    if ($this->start === null) {
-      throw new \Exception("No starting point defined");
+    $startCount = 0;
+    $endCount = 0;
+    foreach ($this->points as $point) {
+      if ($point->isStart()) {
+        $startCount++;
+      }
+      if ($point->isEnd()) {
+        $endCount++;
+      }
     }
-    if ($this->end === null) {
-      throw new \Exception("No ending point defined");
+    if ($startCount !== 1) {
+      throw new \Exception("Flow must have exactly one start point.");
+    }
+    if ($endCount !== 1) {
+      throw new \Exception("Flow must have exactly one end point.");
+    }
+
+    foreach ($this->edges as $edge) {
+      if ($edge->getFrom()->isEnd()) {
+        throw new \Exception("Edge '{$edge->getName()}' cannot start from end point '{$edge->getFrom()->getName()}'.");
+      }
     }
   }
 }
