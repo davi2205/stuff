@@ -1,0 +1,5 @@
+{
+    "require-dev": {
+        "lkrms/pretty-php": "^0.4.95"
+    }
+}
