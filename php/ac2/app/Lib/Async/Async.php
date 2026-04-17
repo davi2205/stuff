@@ -14,16 +14,16 @@ class Async {
     return self::$handler;
   }
 
+  public static function setDatabaseConnection(string $connection): AsyncHandler {
+    return self::instance()->setDatabaseConnection($connection);
+  }
+
   public static function call(string|array $function, ...$args): AsyncHandler {
     return self::instance()->call($function, ...$args);
   }
 
   public static function processQueue(int $maxRounds = PHP_INT_MAX): AsyncHandler {
     return self::instance()->processQueue($maxRounds);
-  }
-
-  public static function setDatabaseConnection(string $connection): AsyncHandler {
-    return self::instance()->setDatabaseConnection($connection);
   }
 
   /**
