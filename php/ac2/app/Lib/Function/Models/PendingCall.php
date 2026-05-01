@@ -1,6 +1,6 @@
 <?php 
 
-namespace App\Lib\Async\Models;
+namespace App\Lib\Function\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
@@ -15,6 +15,10 @@ class PendingCall extends Model {
     'is_static',
     'args',
     'error',
+    'url',
+    'referer',
+    'ip',
+    'user_agent',
     'user_id',
     'user_type',
   ];
