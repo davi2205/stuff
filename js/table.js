@@ -47,10 +47,34 @@ var DB = (function () {
     selectedCursor = cursors[alias];
   }
 
+  function append() {
+    var row, i, len, column;
+    if (!selectedCursor) {
+      throw new Error('Cannot append because no cursor is selected.');
+    }
+    row = new Object();
+    for (i = 0, len = selectedCursor.table.columns.length; i < len; i++) {
+      column = selectedCursor.table.columns[i];
+      row[column.name] = null;
+    }
+    if (selectedCursor.rowsType === 'table') {
+      selectedCursor.table.rows.push(row);
+      selectedCursor.index = selectedCursor.table.rows.length - 1;
+      this[selectedCursor.alias] = row;
+    } else {
+      throw new Error(selectedCursor.alias + ' does not support appending.');
+    }
+  }
+
   function log() {
-    console.log(this);
-    console.log(tables);
-    console.log(cursors);
+    var name, table;
+    for (name in tables) {
+      if (tables.hasOwnProperty(name)) {
+        table = tables[name];
+        console.log('Table: ' + name);
+        console.table(table.rows);
+      }
+    }
   }
 
   var tables, cursors, selectedCursor;
@@ -61,6 +85,7 @@ var DB = (function () {
     create: create,
     open: open,
     select: select,
+    append: append,
     log: log,
   };
 })();
@@ -79,9 +104,45 @@ with (DB) {
   ]);
 
   open('user');
+  open('post');
+
+  /* create user */
   select('user');
 
-  console.log(user);
+  log();
+  append();
+  user.id = 1;
+  user.name = 'John Doe';
+  user.email = 'teste@teste.com';
+  
+  log();
+  append();
+  user.id = 2;
+  user.name = 'Jane Doe';
+  user.email = 'teste2@teste.com';
+
+  log();
+  append();
+  user.id = 3;
+  user.name = 'Bob Smith';
+  user.email = 'teste3@teste.com';
+  
+  /* create post */
+  select('post');
+  
+  log();
+  append();
+  post.id = 1;
+  post.user_id = user.id;
+  post.title = 'Hello World';
+  post.content = 'This is my first post.';
+
+  log();
+  append();
+  post.id = 1;
+  post.user_id = user.id;
+  post.title = 'Hello World';
+  post.content = 'This is my first post.';
 
   log();
 }
