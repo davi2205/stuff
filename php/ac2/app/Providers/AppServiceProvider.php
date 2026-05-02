@@ -2,26 +2,22 @@
 
 namespace App\Providers;
 
-use App\Lib\Async\Listeners\RequestHandledListener;
-use Illuminate\Foundation\Http\Events\RequestHandled;
-use Illuminate\Support\Facades\Event;
+use App\Lib\Async\Services\AsyncService;
+use App\Lib\Function\Services\FunctionService;
 use Illuminate\Support\ServiceProvider;
 
-class AppServiceProvider extends ServiceProvider
-{
+class AppServiceProvider extends ServiceProvider {
   /**
    * Register any application services.
    */
-  public function register(): void
-  {
-    //
+  public function register(): void {
+    $this->app->singleton('function', function ($app) { return $app->make(FunctionService::class); });
   }
 
   /**
    * Bootstrap any application services.
    */
-  public function boot(): void
-  {
+  public function boot(): void {
     //
   }
 }

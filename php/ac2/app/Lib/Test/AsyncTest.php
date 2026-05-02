@@ -2,15 +2,16 @@
 
 namespace App\Lib\Test;
 
-use App\Lib\Async\Async;
+use App\Lib\Async\Facades\Async;
+use App\Lib\Function\Facades\Func;
 use Illuminate\Support\Facades\Log;
 
 class AsyncTest {
   public function test(): void {
-    Async::call([self::class, 'test2']);
+    Func::callOrQueue([$this, 'test2']);
   }
 
   public function test2(): void {
-    Async::call([self::class, 'test3']);
+    throw new \Exception("Test exception");
   }
 }

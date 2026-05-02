@@ -1,11 +1,11 @@
 <?php
 
-use App\Lib\Async\Async;
+use App\Lib\Function\Facades\Func;
 use App\Lib\Test\AsyncTest;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-  Async::call([AsyncTest::class, 'test'])->processQueue();
+  Func::callOrQueue([new AsyncTest(), 'test']);
   return view('welcome');
 });
+ 

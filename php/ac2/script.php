@@ -3,9 +3,17 @@
 use App\Lib\Async\Async;
 use App\Lib\Async\AsyncHandler;
 use App\Lib\Flow\Flow;
-use App\Lib\ZBase\Filter;
-use App\Lib\ZBase\FilterNode;
+use App\Lib\Table\Filter;
+use App\Lib\Table\Parser;
 use Illuminate\Contracts\Database\Query\Builder;
+
+dump(
+  (new Parser)->parse(<<<TEXT
+    (concat 'result is ' (- (+ 123 32) (/ 23 43)))
+  TEXT)
+);
+
+die;
 
 function parseFunction(string|array $function): object
 {
