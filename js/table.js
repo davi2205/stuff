@@ -1,11 +1,9 @@
 
 
 var DB = (function () {
-  function create(name, items) {
+  // Table ------------------------------
+  function createTable(name, items) {
     var table, i, len, item;
-    if (tables[name]) {
-      throw new Error('Cannot create ' + name + ' because it already exists.');
-    }
     table = {
       name: name,
       columns: new Array(),
@@ -18,25 +16,81 @@ var DB = (function () {
         type: item[1],
       });
     }
-    tables[name] = table;
+    return table;
+  }
+
+  function appendToTable(table) {
+    var row, i, len, column;
+    row = new Object();
+    for (i = 0, len = table.columns.length; i < len; i++) {
+      column = table.columns[i];
+      row[column.name] = null;
+    }
+    table.rows.push(row);
+  }
+
+  function removeFromTable(table, row) {
+    var index = table.rows.indexOf(row);
+    if (index !== -1) {
+      table.rows.splice(index, 1);
+    }
+  }
+
+  // Cursor ------------------------------
+  function createCursor(table, alias) {
+    return {
+      alias: alias,
+      table: table,
+      index: 0,
+      filter: null,
+    };
+  }
+
+  function appendThroughCursor(cursor) {
+    appendToTable(cursor.table);
+    cursor.index = cursor.table.rows.length - 1;
+  }
+
+  function removeThroughCursor(cursor) {
+    var row;
+    row = cursor.table.rows[cursor.index];
+    if (row) {
+      removeFromTable(cursor.table, row);
+      if (cursor.index >= cursor.table.rows.length) {
+        cursor.index = cursor.table.rows.length - 1;
+      }
+      return true;
+    }
+    return false;
+  }
+
+  function moveCursor(cursor, amount) {
+    var newIndex;
+    newIndex = cursor.index + amount;
+    if (newIndex < 0) {
+      newIndex = 0;
+    } else if (newIndex >= cursor.table.rows.length) {
+      newIndex = cursor.table.rows.length - 1;
+    }
+    cursor.index = newIndex;
+  }
+
+  // API ------------------------------
+  function create(name, items) {
+    if (tables[name]) {
+      throw new Error('Cannot create ' + name + ' because it already exists.');
+    }
+    tables[name] = createTable(name, items);
   }
 
   function open(name, alias) {
-    var cursor;
     if (typeof alias === 'undefined') {
       alias = name;
     }
     if (!tables[name]) {
       throw new Error('Cannot open ' + name + ' because it does not exist.');
     }
-    cursor = {
-      alias: alias,
-      table: tables[name],
-      rowsType: 'table',
-      rows: tables[name].rows,
-      index: 0,
-    };
-    cursors[alias] = cursor;
+    cursors[alias] = createCursor(tables[name], alias);
     this[alias] = null;
   }
 
@@ -48,22 +102,37 @@ var DB = (function () {
   }
 
   function append() {
-    var row, i, len, column;
     if (!selectedCursor) {
       throw new Error('Cannot append because no cursor is selected.');
     }
-    row = new Object();
-    for (i = 0, len = selectedCursor.table.columns.length; i < len; i++) {
-      column = selectedCursor.table.columns[i];
-      row[column.name] = null;
+    appendThroughCursor(selectedCursor);
+    this[selectedCursor.alias] = selectedCursor.table.rows[selectedCursor.index] || null;
+  }
+
+  function remove() {
+    if (!selectedCursor) {
+      throw new Error('Cannot remove because no cursor is selected.');
     }
-    if (selectedCursor.rowsType === 'table') {
-      selectedCursor.table.rows.push(row);
-      selectedCursor.index = selectedCursor.table.rows.length - 1;
-      this[selectedCursor.alias] = row;
-    } else {
-      throw new Error(selectedCursor.alias + ' does not support appending.');
+    if (removeThroughCursor(selectedCursor)) {
+      return;
     }
+    this[selectedCursor.alias] = selectedCursor.table.rows[selectedCursor.index] || null;
+  }
+
+  function move(amount) {
+    if (!selectedCursor) {
+      throw new Error('Cannot move because no cursor is selected.');
+    }
+    moveCursor(selectedCursor, amount);
+    this[selectedCursor.alias] = selectedCursor.table.rows[selectedCursor.index] || null;
+  }
+
+  function moveToNext() {
+    move.call(this, 1);
+  }
+
+  function moveToPrevious() {
+    move.call(this, -1);
   }
 
   function log() {
@@ -80,69 +149,44 @@ var DB = (function () {
   var tables, cursors, selectedCursor;
   tables = new Object();
   cursors = new Object();
-  
+  selectedCursor = null;
+
   return {
     create: create,
     open: open,
     select: select,
     append: append,
+    remove: remove,
+    move: move,
+    moveToNext: moveToNext,
+    moveToPrevious: moveToPrevious,
     log: log,
   };
 })();
 
 with (DB) {
   create('user', [
-    ['id', 'integer'],
     ['name', 'string'],
     ['email', 'string']
   ]);
-  create('post', [
-    ['id', 'integer'],
-    ['user_id', 'integer'],
-    ['title', 'string'],
-    ['content', 'text']
-  ]);
 
   open('user');
-  open('post');
 
   /* create user */
   select('user');
 
-  log();
   append();
-  user.id = 1;
   user.name = 'John Doe';
   user.email = 'teste@teste.com';
   
-  log();
   append();
-  user.id = 2;
   user.name = 'Jane Doe';
   user.email = 'teste2@teste.com';
 
-  log();
   append();
-  user.id = 3;
   user.name = 'Bob Smith';
   user.email = 'teste3@teste.com';
-  
-  /* create post */
-  select('post');
-  
-  log();
-  append();
-  post.id = 1;
-  post.user_id = user.id;
-  post.title = 'Hello World';
-  post.content = 'This is my first post.';
 
-  log();
-  append();
-  post.id = 1;
-  post.user_id = user.id;
-  post.title = 'Hello World';
-  post.content = 'This is my first post.';
-
-  log();
+  moveToPrevious();
+  console.log(user);
 }
