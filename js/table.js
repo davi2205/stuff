@@ -76,6 +76,14 @@ var DB = (function () {
   }
 
   // API ------------------------------
+  function begin() {
+    
+  }
+
+  function end() {
+    //
+  }
+
   function create(name, items) {
     if (tables[name]) {
       throw new Error('Cannot create ' + name + ' because it already exists.');
@@ -83,12 +91,15 @@ var DB = (function () {
     tables[name] = createTable(name, items);
   }
 
-  function open(name, alias) {
+  function use(name, alias) {
     if (typeof alias === 'undefined') {
       alias = name;
     }
     if (!tables[name]) {
-      throw new Error('Cannot open ' + name + ' because it does not exist.');
+      throw new Error('Cannot use ' + name + ' because it does not exist.');
+    }
+    if (cursors[alias]) {
+      throw new Error('Cannot use ' + name + ' because it is already in use.');
     }
     cursors[alias] = createCursor(tables[name], alias);
     this[alias] = null;
@@ -150,10 +161,11 @@ var DB = (function () {
   tables = new Object();
   cursors = new Object();
   selectedCursor = null;
+  sessionStack = new Array();
 
   return {
     create: create,
-    open: open,
+    use: use,
     select: select,
     append: append,
     remove: remove,
@@ -170,7 +182,7 @@ with (DB) {
     ['email', 'string']
   ]);
 
-  open('user');
+  use('user');
 
   /* create user */
   select('user');
