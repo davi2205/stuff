@@ -94,7 +94,7 @@ function createProcessManager() {
     }
     var process = createProcess(type, name);
     processes.push(process);
-    send(process.name, 'boot');
+    send(process.name, 'init');
     return process.name;
   }
 
@@ -187,11 +187,9 @@ mgr.addType('example', {
 });
 mgr.addType('example2', {
   messages: {
-    boot: function (something) {
+    init: function (something) {
       var self = this;
-      setInterval(function () {
-        self.broadcast('say', 'Tick from ' + self.getName());
-      }, 2000);
+      setInterval(function () { self.broadcast('say', 'Tick from ' + self.getName()); }, 2000);
     }
   },
 });
