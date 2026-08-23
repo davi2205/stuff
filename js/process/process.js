@@ -16,10 +16,7 @@ function createProcessManager() {
         messages[messageName] = config.messages[messageName];
       }
     }
-    return {
-      name: name,
-      messages: messages
-    };
+    return { name: name, messages: messages };
   }
 
   function addType(name, config) {
@@ -178,20 +175,24 @@ function createProcessManager() {
 }
 
 var mgr = createProcessManager();
+
 mgr.addType('example', {
   messages: {
     say: function (something) {
       console.log(this.getName(), something);
     },
-  },
+  }
 });
+
 mgr.addType('example2', {
   messages: {
-    init: function (something) {
+    init: function () {
       var self = this;
-      setInterval(function () { self.broadcast('say', 'Tick from ' + self.getName()); }, 2000);
+      setInterval(function () {
+        self.broadcast('say', 'Tick from ' + self.getName());
+      }, 2000);
     }
-  },
+  }
 });
 
 mgr.spawn('example');
