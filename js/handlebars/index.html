@@ -63,7 +63,7 @@
       var handlebars = Handlebars.create();
       var templates = {};
 
-      function collectTemplate(elt) {
+      function registerTemplate(elt) {
         var item = elt.getAttribute('tn-item');
         if (item !== 'template' && item !== 'partial') {
           throw new Error('Invalid tn-item value: ' + item);
@@ -188,7 +188,7 @@
       // ----------------------------
       forEachItem(document, function(elt, item) {
         if (item === 'template' || item === 'partial') {
-          collectTemplate(elt);
+          registerTemplate(elt);
         } else if (item === 'event') {
           initEvent(elt);
         }
