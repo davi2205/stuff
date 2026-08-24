@@ -8,7 +8,7 @@
 </head>
 
 <body>
-  <script type="text/x-template" tn-item="partial" tn-key="test-row">
+  <script type="text/x-template" tn-item="partial" tn-name="test-row">
     <tr>
       <td>{{name}}</td>
       <td>{{hometown}}</td>
@@ -16,7 +16,7 @@
     </tr>
   </script>
 
-  <script type="text/x-template" tn-item="template" tn-key="test">
+  <script type="text/x-template" tn-item="template" tn-name="test">
     <div id="{{getid}}">
       <table>
         <tbody>
@@ -30,13 +30,13 @@
       
       <div
         tn-item="event"
-        tn-source="#{{getid}} .button1"
+        tn-source="#app .button1"
         tn-trigger="click"
         tn-action="button1Clicked">
       </div>
       <div
         tn-item="event"
-        tn-source="#{{getid}} .button2"
+        tn-source="#app .button2"
         tn-trigger="click"
         tn-action="button2Clicked">
       </div>
@@ -45,13 +45,10 @@
  
   <script>
     function button1Clicked(event, context) {
-      context.data.items.push({name: 'New Person', hometown: 'New Town'});
-      tn.renderPartial('test-row', context.data.items[context.data.items.length - 1],'append', '#app table > tbody');
+      alert('a');
     }
 
     function button2Clicked(event, context) {
-      context.data.items.push({name: 'New Person', hometown: 'New Town'});
-      tn.renderTemplate('test', context.data, 'replaceContent', '#app');
     }
   </script>
 
@@ -61,173 +58,144 @@
   <script src="js/handlebars.min.js"></script>
   <script>
     var tn = (function() {
-      /*========================*/
-      /*  Handlebars Helpers    */
-      /*========================*/
-      var transientStack = [];
+      // templates
+      // ----------------------------
       var handlebars = Handlebars.create();
-
-      handlebars.registerHelper('getid', function() {
-        return transientStack[transientStack.length - 1].id;
-      });
-
-      function pushTransients() {
-        transientStack.push({
-          id: 't' + Math.random().toString(36).substr(2, 9)
-        });
-      }
-
-      function popTransients() {
-        transientStack.pop();
-      }
-
-      /*========================*/
-      /*  Instances             */
-      /*========================*/
-      function forEachInstance(rootElement, callback) {
-        var instanceElts = rootElement.querySelectorAll('[tn-item]');
-        var instanceItemKeys = {};
-        var i, len;
-        for (i = 0, len = instanceElts.length; i < len; i++) {
-          var instanceElt = instanceElts[i];
-          var item = instanceElt.getAttribute('tn-item');
-          var key = instanceElt.getAttribute('tn-key');
-          var source = instanceElt.getAttribute('tn-source');
-          var trigger = instanceElt.getAttribute('tn-trigger');
-          var action = instanceElt.getAttribute('tn-action');
-          if (key) {
-            var typeKey = item + key;
-            if (instanceItemKeys[typeKey]) {
-              throw new Error('Duplicate \'' + item + '\' key: ' + key);
-            } else {
-              instanceItemKeys[typeKey] = true;
-            }
-          }
-          callback({
-            element: instanceElt,
-            item: item,
-            key: key,
-            source: source,
-            trigger: trigger,
-            action: action
-          });
-        }
-      }
-
-      /*========================*/
-      /*  Templates             */
-      /*========================*/
       var templates = {};
 
-      function insertTemplateImpl(instance, prefix) {
-        var templateSource = instance.element.innerHTML;
+      function collectTemplate(elt) {
+        var item = elt.getAttribute('tn-item');
+        if (item !== 'template' && item !== 'partial') {
+          throw new Error('Invalid tn-item value: ' + item);
+        }
+        var name = elt.getAttribute('tn-name');
+        if (!name) {
+          throw new Error('Missing tn-name attribute for ' + item);
+        }
+        if (templates[name]) {
+          throw new Error('Duplicate template name: ' + name);
+        }
+        var templateSource = elt.innerHTML;
         var template = handlebars.compile(templateSource);
-        templates[prefix + instance.key] = template;
-      }
-
-      function insertTemplate(instance) {
-        insertTemplateImpl(instance, 't:');
-      }
-
-      function insertPartial(instance) {
-        insertTemplateImpl(instance, 'p:');
-        handlebars.registerPartial(instance.key, templates['p:' + instance.key]);
-      }
-
-      function renderTemplateImpl(template, data, strategy, targetOrSelector) {
-        var targetElt = document.querySelector(targetOrSelector);
-        if (!targetElt) {
-          throw new Error('Target element not found: ' + targetOrSelector);
+        templates[name] = template;
+        if (item === 'partial') {
+          handlebars.registerPartial(name, template);
         }
-        pushTransients();
-        var html = template(data);
-        popTransients();
-        var elt;
-        if (strategy === 'append') {
-          targetElt.insertAdjacentHTML('beforeend', html);
-          elt = targetElt.children[targetElt.children.length - 1];
-        } else if (strategy === 'replace') {
-          targetElt.insertAdjacentHTML('afterend', html);
-          elt = nextElementSibling(targetElt);
-          targetElt.remove();
-        } else if (strategy === 'replaceContent') {
-          targetElt.innerHTML = html;
-          elt = targetElt.children[0];
+      }
+
+      function renderTemplate(name, data, place, targetOrSelector) {
+        var target;
+        if (typeof targetOrSelector === 'string') {
+          target = document.querySelector(targetOrSelector);
+          if (!target) {
+            throw new Error('Target element not found for selector: ' + targetOrSelector);
+          }
+        } else if (targetOrSelector instanceof Element) {
+          target = targetOrSelector;
         } else {
-          throw new Error('Unknown strategy: ' + strategy);
+          throw new Error('Invalid target or selector: ' + targetOrSelector);
         }
-        forEachInstance(elt, function(instance) {
-          if (instance.item == 'template' || instance.item == 'partial') {
-            throw new Error('Nested templates/partials are not supported: ' + instance.key);
-          } else if (instance.item == 'event') {
-            setupEvent(instance, data);
+        var template = templates[name];
+        if (!template) {
+          throw new Error('Template not found: ' + name);
+        }
+        var html = template(data);
+        var elt;
+        if (place === 'fill') {
+          target.innerHTML = html;
+          elt = target.children[0];
+        } else if (place === 'replace') {
+          target.insertAdjacentHTML('afterend', html);
+          elt = nextElementSibling(target);
+          target.remove();
+        } else if (place === 'beforeend') {
+          target.insertAdjacentHTML('beforeend', html);
+          elt = target.children[target.children.length - 1];
+        } else if (place === 'afterbegin') {
+          target.insertAdjacentHTML('afterbegin', html);
+          elt = target.children[0];
+        } else if (place === 'beforebegin') {
+          target.insertAdjacentHTML('beforebegin', html);
+          elt = prevElementSibling(target);
+        } else if (place === 'afterend') {
+          target.insertAdjacentHTML('afterend', html);
+          elt = nextElementSibling(target);
+        } else {
+          throw new Error('Unknown place value: ' + place);
+        }
+        forEachItem(elt, function(childElt, item) {
+          if (item === 'template' || item === 'partial') {
+            throw new Error('Nested templates/partials are not supported: ' + childElt.getAttribute('tn-name'));
+          } else if (item === 'event') {
+            initEvent(childElt);
           }
         });
       }
 
-      function renderTemplate(templateKey, data, strategy, targetOrSelector) {
-        var template = templates['t:' + templateKey];
-        if (!template) {
-          throw new Error('Template not found: ' + templateKey);
+      // events
+      // ----------------------------
+      function initEvent(elt) {
+        var sourceSelector = elt.getAttribute('tn-source');
+        var trigger = elt.getAttribute('tn-trigger');
+        var actionName = elt.getAttribute('tn-action');
+        if (!sourceSelector || !trigger || !actionName) {
+          throw new Error('Missing tn-source, tn-trigger, or tn-action attribute for event');
         }
-        renderTemplateImpl(template, data, strategy, targetOrSelector);
-      }
-
-      function renderPartial(partialKey, data, strategy, targetOrSelector) {
-        var template = templates['p:' + partialKey];
-        if (!template) {
-          throw new Error('Partial not found: ' + partialKey);
+        var sourceElement = document.querySelector(sourceSelector);
+        if (!sourceElement) {
+          throw new Error('Source element not found for selector: ' + sourceSelector);
         }
-        renderTemplateImpl(template, data, strategy, targetOrSelector);
-      }
-
-      /*========================*/
-      /*  Events                */
-      /*========================*/
-      function setupEvent(instance, data) {
-        data = data || {};
-        var sourceElt = document.querySelector(instance.source);
-        if (!sourceElt) {
-          throw new Error('Source element not found: ' + instance.source);
-        }
-        var context = {data: data};
-        sourceElt.addEventListener(instance.trigger, function(event) {
-          var actionFunction = window[instance.action];
+        var actionFunction = window[actionName];
+        console.log('Binding event:', trigger, 'on', sourceSelector, 'to action:', actionName);
+        sourceElement.addEventListener(trigger, function(event) {
           if (typeof actionFunction === 'function') {
-            actionFunction(event, context);
+            actionFunction(event);
           } else {
-            throw new Error('Action function not found: ' + instance.action);
+            throw new Error('Action function not found: ' + actionName);
           }
         });
       }
 
-      /*========================*/
-      /*  Helpers               */
-      /*========================*/
-      function nextElementSibling(element) {
-        var sibling = element.nextSibling;
+      // helpers
+      // ----------------------------
+      function forEachItem(root, callback) {
+        var itemElts = root.querySelectorAll('[tn-item]');
+        var i, len;
+        for (i = 0, len = itemElts.length; i < len; i++) {
+          var itemElt = itemElts[i];
+          var item = itemElt.getAttribute('tn-item');
+          callback(itemElt, item);
+        }
+      }
+
+      function nextElementSibling(elt) {
+        var sibling = elt.nextSibling;
         while (sibling && sibling.nodeType !== 1) {
           sibling = sibling.nextSibling;
         }
         return sibling;
       }
 
-      /*========================*/
-      /*  Initialization        */
-      /*========================*/
-      forEachInstance(document, function(instance) {
-        if (instance.item == 'template') {
-          insertTemplate(instance);
-        } else if (instance.item == 'partial') {
-          insertPartial(instance);
-        } else if (instance.item == 'event') {
-          setupEvent(instance);
+      function prevElementSibling(elt) {
+        var sibling = elt.previousSibling;
+        while (sibling && sibling.nodeType !== 1) {
+          sibling = sibling.previousSibling;
+        }
+        return sibling;
+      }
+    
+      // initialization
+      // ----------------------------
+      forEachItem(document, function(elt, item) {
+        if (item === 'template' || item === 'partial') {
+          collectTemplate(elt);
+        } else if (item === 'event') {
+          initEvent(elt);
         }
       });
 
       return {
-        renderTemplate: renderTemplate,
-        renderPartial: renderPartial
+        renderTemplate: renderTemplate
       };
     })();
   </script>
@@ -240,10 +208,7 @@
         { name: 'Charlie', hometown: 'Chocolate Factory' }
       ]
     };
-    tn.renderTemplate(
-      'test', data,
-      'replaceContent', '#app'
-    );
+    tn.renderTemplate('test', data, 'fill', '#app');
   </script>
 </body>
 
