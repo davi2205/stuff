@@ -9,15 +9,19 @@
 
 <body>
   <script type="text/x-template" tn-item="partial" tn-name="test-row">
-    <tr>
+    <tr id="{{getid}}">
       <td>{{name}}</td>
       <td>{{hometown}}</td>
       <td><button onclick="alert('Hello, {{name}}!')">Greet</button></td>
+      <td>
+
+        <button class="remove-button">Remove</button>
+      </td>
     </tr>
   </script>
 
   <script type="text/x-template" tn-item="template" tn-name="test">
-    <div id="{{getid}}">
+    <div id="{{getid}}">    
       <table>
         <tbody>
           {{#each items}}
@@ -25,30 +29,83 @@
           {{/each}}
         </tbody>
       </table>
-      <button class="button1">Click Me</button>
-      <button class="button2">Click Me 2</button>
+
+      <button class="button1">Add</button>
+      <button class="button2">Remove</button>
+      <button class="button3">Refresh</button>
       
       <div
         tn-item="event"
-        tn-source="#app .button1"
+        tn-source="#{{getid}} .button1"
         tn-trigger="click"
         tn-action="button1Clicked">
       </div>
       <div
         tn-item="event"
-        tn-source="#app .button2"
+        tn-source="#{{getid}} .button2"
         tn-trigger="click"
         tn-action="button2Clicked">
       </div>
+      <div
+        tn-item="event"
+        tn-source="#{{getid}} .button3"
+        tn-trigger="click"
+        tn-action="button3Clicked">
+      </div>
+
+      {{#each items}}
+        <div
+          tn-item="event"
+          tn-source="#{{getid}}-{{@index}} .remove-button"
+          tn-trigger="click"
+          tn-action="button4Clicked">
+        </div>
+      {{/each}}
+
     </div>
   </script>
  
   <script>
+    // TODO: place everything in "render"
+
     function button1Clicked(event, context) {
-      alert('a');
+      var items = context.data.items;
+      items.push({ name: 'New Person', hometown: 'New Town' });
+      
+      var id = context.render.id;
+      tn.renderTemplate(
+        /*template*/ 'test-row',
+        /*data*/ items[items.length - 1],
+        /*place*/ 'beforeend',
+        /*target*/ '#'+id+' tbody'
+      );
     }
 
     function button2Clicked(event, context) {
+      var items = context.data.items;
+      items.pop();
+      
+      var id = context.render.id;
+      document.querySelector('#'+id+' tbody tr:last-child').remove();
+    }
+
+    function button4Clicked(event, context) {
+      var index = parseInt(event.currentTarget.closest('tr').id.split('-').pop(), 10);
+      var items = context.data.items;
+      items.splice(index, 1);
+      
+      var id = context.render.id;
+      document.getElementById(id + '-' + index).remove();
+    }
+
+    function button3Clicked(event, context) {
+      var id = context.render.id;
+      tn.renderTemplate(
+        /*template*/ 'test',
+        /*data*/ context.data,
+        /*place*/ 'replace',
+        /*target*/ '#'+id
+      );
     }
   </script>
 
@@ -60,9 +117,6 @@
     var tn = (function() {
       // templates
       // ----------------------------
-      var handlebars = Handlebars.create();
-      var templates = {};
-
       function registerTemplate(elt) {
         var item = elt.getAttribute('tn-item');
         if (item !== 'template' && item !== 'partial') {
@@ -76,7 +130,7 @@
           throw new Error('Duplicate template name: ' + name);
         }
         var templateSource = elt.innerHTML;
-        var template = handlebars.compile(templateSource);
+        var template = handlebars.compile('{{#capture}}' + templateSource + '{{/capture}}');
         templates[name] = template;
         if (item === 'partial') {
           handlebars.registerPartial(name, template);
@@ -99,6 +153,7 @@
         if (!template) {
           throw new Error('Template not found: ' + name);
         }
+        //var renderVars = helperVarStack[helperVarStack.length - 1];
         var html = template(data);
         var elt;
         if (place === 'fill') {
@@ -127,14 +182,49 @@
           if (item === 'template' || item === 'partial') {
             throw new Error('Nested templates/partials are not supported: ' + childElt.getAttribute('tn-name'));
           } else if (item === 'event') {
-            initEvent(childElt);
+            initEvent(childElt, {render: {}, data: data});
           }
         });
       }
 
+      var handlebars = Handlebars.create();
+      var templates = {};
+
+      // helpers
+      // ----------------------------
+      var helperVarStack = [];
+      var topLevelId;
+
+      function pushHelperVars() {
+        var context = { id: generateUniqueId() };
+        helperVarStack.push(context);
+        if (helperVarStack.length === 1) {
+          topLevelId = context.id;
+        }
+      }
+
+      function popHelperVars() {
+        var context = helperVarStack.pop();
+      }
+
+      handlebars.registerHelper('getid', function() {
+        if (helperVarStack.length === 0) {
+          throw new Error('No context available for getid helper');
+        }
+        return helperVarStack[helperVarStack.length - 1].id;
+      });
+
+      handlebars.registerHelper('capture', function(options) {
+        pushHelperVars();
+        var result = options.fn(this);
+        popHelperVars();
+        return topLevelId + ':' + result;
+      });
+
       // events
       // ----------------------------
-      function initEvent(elt) {
+      function initEvent(elt, context) {
+        context = context || {render: {}, data: {}};
         var sourceSelector = elt.getAttribute('tn-source');
         var trigger = elt.getAttribute('tn-trigger');
         var actionName = elt.getAttribute('tn-action');
@@ -146,10 +236,9 @@
           throw new Error('Source element not found for selector: ' + sourceSelector);
         }
         var actionFunction = window[actionName];
-        console.log('Binding event:', trigger, 'on', sourceSelector, 'to action:', actionName);
         sourceElement.addEventListener(trigger, function(event) {
           if (typeof actionFunction === 'function') {
-            actionFunction(event);
+            actionFunction(event, context);
           } else {
             throw new Error('Action function not found: ' + actionName);
           }
@@ -182,6 +271,10 @@
           sibling = sibling.previousSibling;
         }
         return sibling;
+      }
+
+      function generateUniqueId() {
+        return 'tn-' + Math.random().toString(36).substr(2, 9);
       }
     
       // initialization
