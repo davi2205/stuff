@@ -1,0 +1,19 @@
+<html>
+  <head>
+
+  </head>
+  <body>
+    <div id="app">
+      
+    </div>
+    <script src="DOM_Walker.js"></script>
+    <script src="DOM_Helper.js"></script>
+    <script src="BS_Helper.js"></script>
+    <script>
+      var helper = new DOM_Helper();
+      var bs_helper = new BS_Helper(helper);
+      var input_element = bs_helper.create_input();
+      document.getElementById('app').appendChild(input_element);
+    </script>
+  </body>
+</html>
